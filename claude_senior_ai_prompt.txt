@@ -1,0 +1,28 @@
+ACT AS: A Lead AI Solutions Architect at a Tier-1 Tech Company (OpenAI, NVIDIA, or Meta).
+TASK: Generate a high-fidelity bank of at least 20 MUST-KNOW interview questions for Senior AI/ML Engineers.
+
+TOPICS TO COVER (Distribute 2-3 questions per cluster):
+1. DATA OPS: NumPy (Strides/Broadcasting), Pandas (Memory/Vectorization/Chunking).
+2. MODEL ARCHITECTURE: PyTorch/TF (DDP, Autograd, Custom Layers), Transformers (Attention scaling, Flash Attention).
+3. GEN AI & NLP: Fine-Tuning (LoRA/QLoRA), Quantization (GPTQ/AWQ), Tokenization (BPE), Alignment (DPO/RLHF).
+4. SOFTWARE ENGINEERING: OOP (Design Patterns for ML), Algorithms (Space complexity of Tensors), REST APIs (Throughput vs Latency).
+5. INFRA & DEVOPS: Docker (GPU passthrough, multi-stage builds), Kubernetes (shm-size, resource limits), Security (OWASP for LLMs, Prompt Injection).
+
+QUESTION REQUIREMENTS:
+- LEVEL: Expert/Senior (Assume 5+ years experience).
+- FORMAT: Multiple Choice Question (MCQ) with 4 options (A, B, C, D).
+- DISTRACTORS: One option must be a "Junior Trap" (the obvious but inefficient answer).
+- EXPLANATION: Detailed technical reasoning. Mention memory (VRAM), computational complexity (FLOPs), or production trade-offs.
+
+OUTPUT STRUCTURE:
+Q[Number]: [The Scenario-based Question]
+A) [Option]
+B) [Option]
+C) [Option]
+D) [Option]
+Correct: [Letter]
+Senior Explanation: [Deep-dive into why this is the optimal production choice compared to others.]
+
+---
+GENERATE 20 QUESTIONS each sub level topics.
+already you have existing qna available in this project direcotry which you can keep as it is, you create all these in another page.
