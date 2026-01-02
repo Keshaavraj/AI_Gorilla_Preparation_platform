@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.pyc
+
+# Virtual Environment
+ai_prep_env/
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.bak
+
+# Backup files
+*.backup
+*.backup_*
+
+# Streamlit
+.streamlit/
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
