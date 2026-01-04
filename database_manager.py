@@ -9,9 +9,15 @@ from datetime import datetime
 from typing import List, Dict, Optional
 
 class QuestionDatabase:
-    def __init__(self, db_file='questions_db.json'):
+    def __init__(self, db_file='questions_db.json',
+                 topics_file='topic_resources.json',
+                 must_know_file='must_know_topics.json'):
         self.db_file = db_file
+        self.topics_file = topics_file
+        self.must_know_file = must_know_file
         self.questions = self._load_database()
+        self.topics = self._load_topics()
+        self.must_know = self._load_must_know()
 
     def _load_database(self) -> Dict:
         """Load questions from JSON file"""
@@ -19,6 +25,20 @@ class QuestionDatabase:
             with open(self.db_file, 'r', encoding='utf-8') as f:
                 return json.load(f)
         return self._initialize_database()
+
+    def _load_topics(self) -> Dict:
+        """Load topic resources from JSON file"""
+        if os.path.exists(self.topics_file):
+            with open(self.topics_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        return {"metadata": {}, "topics": {}}
+
+    def _load_must_know(self) -> Dict:
+        """Load must-know topics from JSON file"""
+        if os.path.exists(self.must_know_file):
+            with open(self.must_know_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        return {"metadata": {}, "categories": {}}
 
     def _initialize_database(self) -> Dict:
         """Initialize empty database structure"""
@@ -138,6 +158,31 @@ class QuestionDatabase:
             "category_stats": progress["category_stats"],
             "bookmarked_count": len(progress["bookmarked_questions"])
         }
+
+    def get_topic_resource(self, topic_name: str) -> Optional[Dict]:
+        """Get learning resources for a specific topic"""
+        return self.topics.get("topics", {}).get(topic_name, None)
+
+    def get_all_topics(self) -> List[str]:
+        """Get list of all available topics with resources"""
+        return list(self.topics.get("topics", {}).keys())
+
+    def get_must_know_for_category(self, category: str) -> Optional[Dict]:
+        """Get must-know topics for a category"""
+        return self.must_know.get("categories", {}).get(category, None)
+
+    def search_topics(self, keyword: str) -> List[str]:
+        """Search for topics containing the keyword"""
+        topics = self.topics.get("topics", {})
+        matching = []
+        keyword_lower = keyword.lower()
+
+        for topic_name, topic_data in topics.items():
+            if (keyword_lower in topic_name.lower() or
+                keyword_lower in topic_data.get("category", "").lower()):
+                matching.append(topic_name)
+
+        return matching
 
 
 def create_question(question_text: str, options: List[str], correct_answer: int,

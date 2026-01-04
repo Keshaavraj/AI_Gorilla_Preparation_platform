@@ -1,0 +1,285 @@
+{
+  "metadata": {
+    "description": "Essential topics every AI Engineer must master, organized by category",
+    "purpose": "Guide junior engineers on what to focus on for each domain",
+    "version": "1.0"
+  },
+  "categories": {
+    "Machine Learning": {
+      "fundamental_concepts": [
+        "Supervised vs Unsupervised Learning",
+        "Training, Validation, Test Sets",
+        "Overfitting and Underfitting",
+        "Bias-Variance Tradeoff",
+        "Cross-Validation"
+      ],
+      "algorithms": [
+        "Linear Regression",
+        "Logistic Regression",
+        "Decision Trees",
+        "Random Forests",
+        "Gradient Boosting (XGBoost, LightGBM)",
+        "Support Vector Machines",
+        "K-Nearest Neighbors"
+      ],
+      "optimization": [
+        "Gradient Descent (Batch, SGD, Mini-batch)",
+        "Learning Rate Scheduling",
+        "Regularization (L1, L2, Elastic Net)",
+        "Feature Scaling and Normalization"
+      ],
+      "evaluation": [
+        "Accuracy, Precision, Recall, F1-Score",
+        "ROC-AUC",
+        "Confusion Matrix",
+        "MSE, RMSE, MAE for Regression"
+      ],
+      "priority": "CRITICAL - Foundation for all AI work"
+    },
+    "Deep Learning": {
+      "neural_network_basics": [
+        "Perceptrons and Layers",
+        "Activation Functions (ReLU, Sigmoid, Tanh)",
+        "Forward Propagation",
+        "Backpropagation",
+        "Loss Functions (Cross-Entropy, MSE)"
+      ],
+      "architectures": [
+        "Feedforward Neural Networks",
+        "Convolutional Neural Networks (CNNs)",
+        "Recurrent Neural Networks (RNNs, LSTMs, GRUs)",
+        "Transformers and Attention Mechanism",
+        "Autoencoders and VAEs"
+      ],
+      "optimization_techniques": [
+        "Adam, RMSprop, AdaGrad Optimizers",
+        "Batch Normalization",
+        "Dropout and Regularization",
+        "Weight Initialization (Xavier, He)",
+        "Learning Rate Scheduling"
+      ],
+      "challenges": [
+        "Vanishing/Exploding Gradients",
+        "Overfitting in Deep Networks",
+        "Mode Collapse in GANs",
+        "Catastrophic Forgetting"
+      ],
+      "priority": "CRITICAL - Core of modern AI"
+    },
+    "NLP": {
+      "fundamentals": [
+        "Tokenization (Word, Subword, BPE)",
+        "Word Embeddings (Word2Vec, GloVe)",
+        "Sequence-to-Sequence Models",
+        "Attention Mechanism",
+        "Transformers Architecture"
+      ],
+      "pretrained_models": [
+        "BERT and variants",
+        "GPT family",
+        "T5 and BART",
+        "RoBERTa, DeBERTa"
+      ],
+      "tasks": [
+        "Text Classification",
+        "Named Entity Recognition (NER)",
+        "Question Answering",
+        "Machine Translation",
+        "Text Generation"
+      ],
+      "techniques": [
+        "Transfer Learning",
+        "Fine-tuning",
+        "Prompt Engineering",
+        "Few-shot Learning"
+      ],
+      "priority": "HIGH - Essential for LLM era"
+    },
+    "Generative AI": {
+      "core_concepts": [
+        "Autoregressive Models",
+        "Diffusion Models",
+        "GANs (Generative Adversarial Networks)",
+        "Variational Autoencoders",
+        "Prompt Engineering"
+      ],
+      "llm_concepts": [
+        "Temperature and Sampling",
+        "Top-k and Top-p Sampling",
+        "Context Window",
+        "In-context Learning",
+        "Chain-of-Thought Prompting"
+      ],
+      "fine_tuning": [
+        "Full Fine-tuning",
+        "LoRA (Low-Rank Adaptation)",
+        "QLoRA",
+        "PEFT (Parameter-Efficient Fine-Tuning)",
+        "Prefix Tuning"
+      ],
+      "alignment": [
+        "RLHF (Reinforcement Learning from Human Feedback)",
+        "DPO (Direct Preference Optimization)",
+        "Constitutional AI",
+        "Red Teaming"
+      ],
+      "priority": "VERY HIGH - Current industry focus"
+    },
+    "PyTorch": {
+      "fundamentals": [
+        "Tensors and Operations",
+        "Autograd and Automatic Differentiation",
+        "nn.Module and Building Models",
+        "DataLoader and Datasets",
+        "GPU Operations (CUDA)"
+      ],
+      "training": [
+        "Loss Functions",
+        "Optimizers",
+        "Training Loops",
+        "Gradient Clipping",
+        "Mixed Precision Training"
+      ],
+      "advanced": [
+        "Custom Layers and Modules",
+        "Hooks for Debugging",
+        "Distributed Training (DDP)",
+        "TorchScript and ONNX Export",
+        "Quantization"
+      ],
+      "priority": "CRITICAL - Most popular research framework"
+    },
+    "TensorFlow": {
+      "fundamentals": [
+        "Tensors and tf.function",
+        "Keras API",
+        "GradientTape",
+        "tf.data for Data Pipelines",
+        "Model Subclassing"
+      ],
+      "deployment": [
+        "SavedModel Format",
+        "TensorFlow Serving",
+        "TensorFlow Lite (Mobile)",
+        "TensorFlow.js (Web)"
+      ],
+      "advanced": [
+        "Custom Training Loops",
+        "Distribution Strategies",
+        "Mixed Precision",
+        "XLA Compilation"
+      ],
+      "priority": "HIGH - Industry standard for production"
+    },
+    "NumPy": {
+      "core_operations": [
+        "Array Creation and Indexing",
+        "Broadcasting Rules",
+        "Vectorization",
+        "Matrix Operations",
+        "Random Number Generation"
+      ],
+      "advanced": [
+        "Memory Layout (C vs Fortran order)",
+        "View vs Copy",
+        "Universal Functions (ufuncs)",
+        "Einsum for Complex Operations"
+      ],
+      "priority": "CRITICAL - Foundation of all numerical computing"
+    },
+    "Pandas": {
+      "fundamentals": [
+        "Series and DataFrame",
+        "Indexing and Selection",
+        "GroupBy Operations",
+        "Merge, Join, Concat",
+        "Missing Data Handling"
+      ],
+      "data_manipulation": [
+        "Apply, Map, ApplyMap",
+        "Pivot Tables",
+        "Time Series Operations",
+        "String Operations",
+        "Categorical Data"
+      ],
+      "optimization": [
+        "Vectorization vs Loops",
+        "Memory Optimization",
+        "Query and Eval",
+        "Chunking Large Files"
+      ],
+      "priority": "HIGH - Essential for data preprocessing"
+    },
+    "MLOps": {
+      "model_lifecycle": [
+        "Experiment Tracking (MLflow, Weights & Biases)",
+        "Model Versioning",
+        "Model Registry",
+        "A/B Testing"
+      ],
+      "deployment": [
+        "REST APIs for Models",
+        "Docker Containerization",
+        "Kubernetes for Scaling",
+        "Model Serving (TensorFlow Serving, TorchServe)"
+      ],
+      "monitoring": [
+        "Model Performance Monitoring",
+        "Data Drift Detection",
+        "Concept Drift",
+        "Logging and Alerting"
+      ],
+      "priority": "HIGH - Bridge research to production"
+    },
+    "System Design for ML": {
+      "architecture": [
+        "Microservices vs Monoliths",
+        "Batch vs Real-time Inference",
+        "Caching Strategies",
+        "Load Balancing",
+        "Rate Limiting"
+      ],
+      "scalability": [
+        "Horizontal vs Vertical Scaling",
+        "Distributed Training",
+        "Model Parallelism vs Data Parallelism",
+        "Asynchronous Processing"
+      ],
+      "reliability": [
+        "Fault Tolerance",
+        "Circuit Breakers",
+        "Retry Logic",
+        "Health Checks"
+      ],
+      "priority": "VERY HIGH - Senior engineer requirement"
+    }
+  },
+  "learning_path": {
+    "beginner_priority": [
+      "Python Programming Basics",
+      "NumPy and Pandas",
+      "Machine Learning Fundamentals",
+      "Basic Deep Learning",
+      "One ML Framework (PyTorch recommended)"
+    ],
+    "intermediate_priority": [
+      "Advanced ML Algorithms",
+      "Deep Learning Architectures",
+      "NLP Basics",
+      "Model Deployment Basics",
+      "Git and Software Engineering"
+    ],
+    "advanced_priority": [
+      "Generative AI and LLMs",
+      "Fine-tuning and PEFT",
+      "Distributed Training",
+      "MLOps and Production Systems",
+      "System Design for ML"
+    ],
+    "time_estimates": {
+      "beginner_to_intermediate": "3-6 months with consistent practice",
+      "intermediate_to_advanced": "6-12 months with projects",
+      "interview_ready": "1-2 years total, including hands-on projects"
+    }
+  }
+}

@@ -1,0 +1,1200 @@
+{
+  "metadata": {
+    "created": "2026-01-04",
+    "description": "Comprehensive topic resources for AI Engineer preparation - progressive learning from basics to advanced",
+    "version": "1.0"
+  },
+  "topics": {
+    "Backpropagation": {
+      "category": "Deep Learning",
+      "difficulty": "Medium",
+      "importance": "Critical",
+      "prerequisites": ["Chain Rule", "Gradient Descent", "Neural Network Basics"],
+      "layman_explanation": {
+        "title": "What is Backpropagation in Simple Terms?",
+        "content": "Imagine you're playing a game where you need to adjust multiple knobs to hit a target. Each knob affects the outcome differently. Backpropagation is like having a coach who tells you exactly which knobs to turn and by how much, starting from the last knob and working backwards to the first one. In neural networks, these 'knobs' are weights, and backpropagation tells us how to adjust each weight to reduce errors in predictions."
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of Backpropagation",
+        "content": "Backpropagation is an algorithm for efficiently computing gradients of the loss function with respect to the weights in a neural network. It applies the chain rule of calculus recursively, propagating error gradients backward through the network from the output layer to the input layer. This enables gradient descent optimization by providing the direction and magnitude to adjust each weight to minimize the loss function.",
+        "key_concepts": [
+          "Forward pass: Compute activations layer by layer",
+          "Loss computation: Calculate the error at the output",
+          "Backward pass: Compute gradients using chain rule",
+          "Weight update: Adjust weights using computed gradients"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "Chain Rule for Backpropagation",
+          "formula": "∂L/∂w_ij = (∂L/∂a_j) × (∂a_j/∂z_j) × (∂z_j/∂w_ij)",
+          "explanation": "To find how loss L changes with weight w_ij, we multiply: gradient of loss w.r.t. activation, gradient of activation w.r.t. pre-activation, and gradient of pre-activation w.r.t. weight",
+          "variables": {
+            "L": "Loss function",
+            "w_ij": "Weight from neuron i to neuron j",
+            "a_j": "Activation of neuron j (after activation function)",
+            "z_j": "Pre-activation of neuron j (weighted sum)"
+          }
+        },
+        {
+          "name": "Gradient for Weight Update",
+          "formula": "δ_j = ∂L/∂z_j = (∂L/∂a_j) × σ'(z_j)",
+          "explanation": "The error term delta for neuron j equals the gradient of loss w.r.t. activation times the derivative of the activation function",
+          "variables": {
+            "δ_j": "Error term for neuron j",
+            "σ'": "Derivative of activation function"
+          }
+        },
+        {
+          "name": "Backpropagation for Hidden Layer",
+          "formula": "δ_i = σ'(z_i) × Σ(w_ij × δ_j)",
+          "explanation": "Error for hidden neuron i is computed by summing weighted errors from next layer, multiplied by derivative of activation",
+          "note": "This is the 'backward' propagation - errors flow from output to input"
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "import numpy as np\n\n# Simple 2-layer neural network backpropagation example\nclass SimpleNN:\n    def __init__(self, input_size, hidden_size, output_size):\n        # Initialize weights\n        self.W1 = np.random.randn(input_size, hidden_size) * 0.01\n        self.b1 = np.zeros((1, hidden_size))\n        self.W2 = np.random.randn(hidden_size, output_size) * 0.01\n        self.b2 = np.zeros((1, output_size))\n    \n    def sigmoid(self, z):\n        return 1 / (1 + np.exp(-z))\n    \n    def sigmoid_derivative(self, a):\n        return a * (1 - a)\n    \n    def forward(self, X):\n        \"\"\"Forward pass - compute predictions\"\"\"\n        # Layer 1\n        self.z1 = np.dot(X, self.W1) + self.b1\n        self.a1 = self.sigmoid(self.z1)\n        \n        # Layer 2 (output)\n        self.z2 = np.dot(self.a1, self.W2) + self.b2\n        self.a2 = self.sigmoid(self.z2)\n        \n        return self.a2\n    \n    def backward(self, X, y, learning_rate=0.01):\n        \"\"\"Backpropagation - compute and apply gradients\"\"\"\n        m = X.shape[0]  # number of examples\n        \n        # Step 1: Compute output layer error\n        dz2 = self.a2 - y  # derivative of loss w.r.t. z2\n        dW2 = (1/m) * np.dot(self.a1.T, dz2)\n        db2 = (1/m) * np.sum(dz2, axis=0, keepdims=True)\n        \n        # Step 2: Backpropagate to hidden layer\n        da1 = np.dot(dz2, self.W2.T)\n        dz1 = da1 * self.sigmoid_derivative(self.a1)\n        dW1 = (1/m) * np.dot(X.T, dz1)\n        db1 = (1/m) * np.sum(dz1, axis=0, keepdims=True)\n        \n        # Step 3: Update weights\n        self.W2 -= learning_rate * dW2\n        self.b2 -= learning_rate * db2\n        self.W1 -= learning_rate * dW1\n        self.b1 -= learning_rate * db1\n\n# Example usage\nX = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])  # XOR inputs\ny = np.array([[0], [1], [1], [0]])  # XOR outputs\n\nnn = SimpleNN(input_size=2, hidden_size=4, output_size=1)\n\n# Training loop\nfor epoch in range(10000):\n    predictions = nn.forward(X)\n    nn.backward(X, y, learning_rate=0.5)\n    \n    if epoch % 1000 == 0:\n        loss = np.mean((predictions - y) ** 2)\n        print(f\"Epoch {epoch}, Loss: {loss:.4f}\")",
+        "explanation": "This implementation shows the core backpropagation algorithm: forward pass computes predictions, backward pass computes gradients using chain rule, and weights are updated using these gradients."
+      },
+      "common_pitfalls": [
+        "Vanishing gradients: Using sigmoid in deep networks causes gradients to become very small",
+        "Exploding gradients: Large weights can cause gradients to grow exponentially",
+        "Forgetting to cache activations: Forward pass values needed for backward pass",
+        "Wrong dimensions: Matrix multiplication requires careful dimension matching"
+      ],
+      "interview_tips": [
+        "Explain the intuition first, then dive into math",
+        "Draw a simple 2-layer network to visualize",
+        "Mention practical issues like vanishing/exploding gradients",
+        "Connect to modern solutions like ReLU, batch norm, skip connections"
+      ],
+      "related_topics": ["Gradient Descent", "Chain Rule", "Activation Functions", "Vanishing Gradients"],
+      "further_reading": [
+        "Deep Learning Book - Chapter 6 (Goodfellow et al.)",
+        "CS231n: Backpropagation Lecture Notes",
+        "Neural Networks and Deep Learning (Michael Nielsen)"
+      ]
+    },
+    "Gradient Descent": {
+      "category": "Machine Learning",
+      "difficulty": "Medium",
+      "importance": "Critical",
+      "prerequisites": ["Derivatives", "Loss Functions", "Linear Algebra"],
+      "layman_explanation": {
+        "title": "What is Gradient Descent in Simple Terms?",
+        "content": "Imagine you're hiking down a mountain in thick fog, and you can only see a few feet around you. To reach the bottom (minimum), you would: (1) Look around and find which direction slopes downward the most, (2) Take a step in that direction, (3) Repeat until you can't go any lower. Gradient descent does exactly this for finding the minimum of a function - it takes steps in the direction of steepest descent (negative gradient) until it reaches a minimum."
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of Gradient Descent",
+        "content": "Gradient descent is an iterative optimization algorithm for finding the minimum of a differentiable function. It works by computing the gradient (vector of partial derivatives) of the loss function with respect to parameters, then updating parameters in the opposite direction of the gradient. The learning rate controls step size. The algorithm converges when gradients become sufficiently small or a maximum number of iterations is reached.",
+        "key_concepts": [
+          "Gradient: Vector pointing in direction of steepest ascent",
+          "Learning rate (α): Step size for parameter updates",
+          "Convergence: When parameters stop changing significantly",
+          "Local vs global minima: GD may get stuck in local minima"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "Batch Gradient Descent Update Rule",
+          "formula": "θ_new = θ_old - α × ∇J(θ)",
+          "explanation": "Update parameters by subtracting learning rate times gradient of loss",
+          "variables": {
+            "θ": "Parameters (weights) to optimize",
+            "α": "Learning rate (step size)",
+            "∇J(θ)": "Gradient of loss function J with respect to θ"
+          }
+        },
+        {
+          "name": "Gradient Computation",
+          "formula": "∇J(θ) = (1/m) × Σ[∇L(f(x_i; θ), y_i)]",
+          "explanation": "Average gradient across all m training examples",
+          "variables": {
+            "m": "Number of training examples",
+            "L": "Loss for single example",
+            "f(x_i; θ)": "Model prediction for input x_i"
+          }
+        },
+        {
+          "name": "Stochastic Gradient Descent (SGD)",
+          "formula": "θ = θ - α × ∇L(f(x_i; θ), y_i)",
+          "explanation": "Update using gradient from single random example (faster, noisier)",
+          "note": "Mini-batch GD uses small batches (e.g., 32-256 examples) for balance"
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "import numpy as np\nimport matplotlib.pyplot as plt\n\n# Simple gradient descent for linear regression\nclass LinearRegressionGD:\n    def __init__(self, learning_rate=0.01, iterations=1000):\n        self.lr = learning_rate\n        self.iterations = iterations\n        self.weights = None\n        self.bias = None\n        self.loss_history = []\n    \n    def fit(self, X, y):\n        \"\"\"Train using gradient descent\"\"\"\n        n_samples, n_features = X.shape\n        \n        # Initialize parameters\n        self.weights = np.zeros(n_features)\n        self.bias = 0\n        \n        # Gradient descent loop\n        for i in range(self.iterations):\n            # Forward pass: compute predictions\n            y_pred = np.dot(X, self.weights) + self.bias\n            \n            # Compute loss (MSE)\n            loss = np.mean((y_pred - y) ** 2)\n            self.loss_history.append(loss)\n            \n            # Compute gradients\n            dw = (2/n_samples) * np.dot(X.T, (y_pred - y))\n            db = (2/n_samples) * np.sum(y_pred - y)\n            \n            # Update parameters\n            self.weights -= self.lr * dw\n            self.bias -= self.lr * db\n            \n            if i % 100 == 0:\n                print(f\"Iteration {i}, Loss: {loss:.4f}\")\n    \n    def predict(self, X):\n        return np.dot(X, self.weights) + self.bias\n\n# Example: Fit a line to data\nnp.random.seed(42)\nX = 2 * np.random.rand(100, 1)\ny = 4 + 3 * X.squeeze() + np.random.randn(100)  # y = 4 + 3x + noise\n\nmodel = LinearRegressionGD(learning_rate=0.1, iterations=1000)\nmodel.fit(X, y)\n\nprint(f\"\\nLearned parameters:\")\nprint(f\"Weight: {model.weights[0]:.4f} (true: 3.0)\")\nprint(f\"Bias: {model.bias:.4f} (true: 4.0)\")\n\n# Plot convergence\nplt.figure(figsize=(10, 4))\nplt.subplot(1, 2, 1)\nplt.plot(model.loss_history)\nplt.xlabel('Iteration')\nplt.ylabel('Loss')\nplt.title('Gradient Descent Convergence')\n\nplt.subplot(1, 2, 2)\nplt.scatter(X, y, alpha=0.5)\nplt.plot(X, model.predict(X), color='red', label='Fitted line')\nplt.xlabel('X')\nplt.ylabel('y')\nplt.legend()\nplt.title('Linear Regression Fit')\nplt.tight_layout()",
+        "explanation": "This shows basic gradient descent: compute predictions, calculate loss, compute gradients, update parameters. The loss decreases over iterations as the model learns."
+      },
+      "variants": {
+        "Batch Gradient Descent": "Uses all training data for each update - slow but stable",
+        "Stochastic Gradient Descent (SGD)": "Uses one random example - fast but noisy",
+        "Mini-batch Gradient Descent": "Uses small batches - good balance of speed and stability",
+        "Momentum": "Adds velocity term to accelerate convergence and reduce oscillation",
+        "Adam": "Adaptive learning rates per parameter - most popular in deep learning",
+        "RMSprop": "Divides learning rate by running average of gradient magnitudes"
+      },
+      "common_pitfalls": [
+        "Learning rate too high: Divergence or oscillation",
+        "Learning rate too low: Extremely slow convergence",
+        "Poor feature scaling: Some parameters update much faster than others",
+        "Getting stuck in local minima: Use random restarts or advanced optimizers"
+      ],
+      "interview_tips": [
+        "Know the difference between batch, mini-batch, and stochastic GD",
+        "Explain learning rate impact with examples",
+        "Mention modern optimizers (Adam, RMSprop) and why they're better",
+        "Discuss convergence criteria and when to stop training"
+      ],
+      "related_topics": ["Backpropagation", "Learning Rate Scheduling", "Momentum", "Adam Optimizer"],
+      "further_reading": [
+        "An overview of gradient descent optimization algorithms (Sebastian Ruder)",
+        "Deep Learning Book - Chapter 8",
+        "CS229 Lecture Notes on Optimization"
+      ]
+    },
+    "Overfitting": {
+      "category": "Machine Learning",
+      "difficulty": "Easy",
+      "importance": "Critical",
+      "prerequisites": ["Training vs Test Sets", "Model Complexity"],
+      "layman_explanation": {
+        "title": "What is Overfitting in Simple Terms?",
+        "content": "Imagine studying for an exam by memorizing every single practice question and answer, word-for-word. You'd ace the practice test but fail when seeing new questions because you memorized instead of understanding concepts. Overfitting is when a model 'memorizes' training data (including noise and outliers) instead of learning general patterns. It performs great on training data but poorly on new, unseen data."
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of Overfitting",
+        "content": "Overfitting occurs when a model learns the training data too well, capturing noise and random fluctuations rather than underlying patterns. This results in high training accuracy but poor generalization to new data. It's characterized by high variance - the model's predictions vary significantly with different training sets. Overfitting typically happens with: overly complex models, insufficient training data, or lack of regularization.",
+        "key_concepts": [
+          "Generalization: Ability to perform well on unseen data",
+          "Bias-Variance Tradeoff: Overfitting = low bias, high variance",
+          "Training vs Validation: Large gap indicates overfitting",
+          "Model Complexity: More parameters → higher overfitting risk"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "Train-Test Gap Indicator",
+          "formula": "Overfitting_Score = Accuracy_train - Accuracy_test",
+          "explanation": "Large positive gap suggests overfitting",
+          "note": "Rule of thumb: gap > 10-15% warrants investigation"
+        },
+        {
+          "name": "L2 Regularization (Ridge)",
+          "formula": "L(θ) = MSE(θ) + λ × Σ(θ_i²)",
+          "explanation": "Add penalty for large weights to prevent overfitting",
+          "variables": {
+            "λ": "Regularization strength (higher = more penalty)",
+            "θ_i": "Model parameters/weights"
+          }
+        },
+        {
+          "name": "L1 Regularization (Lasso)",
+          "formula": "L(θ) = MSE(θ) + λ × Σ|θ_i|",
+          "explanation": "Penalty based on absolute values - encourages sparsity",
+          "note": "Can set some weights to exactly zero (feature selection)"
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.preprocessing import PolynomialFeatures\nfrom sklearn.linear_model import LinearRegression, Ridge\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.metrics import mean_squared_error\n\n# Generate sample data\nnp.random.seed(42)\nX = np.sort(5 * np.random.rand(80, 1), axis=0)\ny = np.sin(X).ravel() + np.random.normal(0, 0.1, X.shape[0])\n\n# Split data\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.3, random_state=42\n)\n\n# Demonstrate overfitting with high-degree polynomial\ndef fit_polynomial(degree, regularization=False):\n    \"\"\"Fit polynomial of given degree\"\"\"\n    poly = PolynomialFeatures(degree=degree)\n    X_train_poly = poly.fit_transform(X_train)\n    X_test_poly = poly.transform(X_test)\n    \n    if regularization:\n        model = Ridge(alpha=1.0)  # L2 regularization\n    else:\n        model = LinearRegression()\n    \n    model.fit(X_train_poly, y_train)\n    \n    train_score = model.score(X_train_poly, y_train)\n    test_score = model.score(X_test_poly, y_test)\n    \n    return model, poly, train_score, test_score\n\n# Compare different model complexities\ndegrees = [1, 3, 15]\nfig, axes = plt.subplots(1, 3, figsize=(15, 4))\n\nfor idx, degree in enumerate(degrees):\n    model, poly, train_score, test_score = fit_polynomial(degree)\n    \n    # Plot\n    X_plot = np.linspace(0, 5, 100).reshape(-1, 1)\n    X_plot_poly = poly.transform(X_plot)\n    y_plot = model.predict(X_plot_poly)\n    \n    axes[idx].scatter(X_train, y_train, alpha=0.6, label='Train')\n    axes[idx].scatter(X_test, y_test, alpha=0.6, label='Test')\n    axes[idx].plot(X_plot, y_plot, 'r-', linewidth=2, label='Prediction')\n    axes[idx].set_title(f'Degree {degree}\\nTrain: {train_score:.3f}, Test: {test_score:.3f}')\n    axes[idx].legend()\n    axes[idx].set_ylim(-1.5, 1.5)\n\nplt.tight_layout()\nprint(\"Degree 1: Underfitting (low train & test scores)\")\nprint(\"Degree 3: Good fit (similar train & test scores)\")\nprint(\"Degree 15: Overfitting (high train, low test score)\")\n\n# Demonstrate regularization to prevent overfitting\nprint(\"\\n--- With Regularization ---\")\nmodel_reg, poly_reg, train_reg, test_reg = fit_polynomial(15, regularization=True)\nprint(f\"Degree 15 with L2: Train={train_reg:.3f}, Test={test_reg:.3f}\")",
+        "explanation": "This code shows overfitting in action: high-degree polynomial fits training data perfectly but fails on test data. Regularization helps by penalizing complex models."
+      },
+      "prevention_techniques": [
+        "More training data: Reduces ability to memorize",
+        "Regularization (L1/L2): Penalize complex models",
+        "Dropout: Randomly disable neurons during training",
+        "Early stopping: Stop training when validation performance degrades",
+        "Cross-validation: Better estimate of generalization",
+        "Simpler models: Reduce capacity to memorize",
+        "Data augmentation: Artificially increase training data diversity"
+      ],
+      "common_pitfalls": [
+        "Only looking at training accuracy - always check test/validation",
+        "Using test set for model selection - causes information leakage",
+        "Not enough training data relative to model complexity",
+        "Ignoring learning curves that show diverging train/test performance"
+      ],
+      "interview_tips": [
+        "Explain train-test gap as key indicator",
+        "Mention at least 3 prevention techniques",
+        "Relate to bias-variance tradeoff",
+        "Give real-world example (e.g., memorizing vs understanding)"
+      ],
+      "related_topics": ["Underfitting", "Regularization", "Cross-Validation", "Bias-Variance Tradeoff"],
+      "further_reading": [
+        "Understanding the Bias-Variance Tradeoff (Scott Fortmann-Roe)",
+        "Regularization in Machine Learning (Andrew Ng)",
+        "Overfitting and Underfitting (scikit-learn docs)"
+      ]
+    },
+    "Transformers": {
+      "category": "Deep Learning",
+      "difficulty": "Advanced",
+      "importance": "Critical",
+      "prerequisites": ["Attention Mechanism", "Neural Networks", "Sequence Modeling"],
+      "layman_explanation": {
+        "title": "What are Transformers in Simple Terms?",
+        "content": "Imagine you're reading a book and can instantly look at any sentence to understand the current one - not just reading left-to-right. Transformers do exactly this: they process entire sequences at once and let each word 'attend to' (look at) all other words to understand context. Unlike older models that read word-by-word, Transformers see the whole picture simultaneously, making them much faster and better at understanding relationships in text."
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of Transformers",
+        "content": "Transformers are a neural architecture introduced in 'Attention Is All You Need' (2017) that revolutionized NLP. The key innovation is the self-attention mechanism, which computes representations by relating different positions in a sequence. Unlike RNNs/LSTMs, Transformers process sequences in parallel, enabling efficient training on GPUs. The architecture consists of encoder and decoder stacks, each with multi-head self-attention and feed-forward layers, plus positional encodings to retain sequence order.",
+        "key_concepts": [
+          "Self-Attention: Each token attends to all tokens in sequence",
+          "Multi-Head Attention: Multiple attention patterns learned in parallel",
+          "Positional Encoding: Injects sequence order information",
+          "Encoder-Decoder Architecture: For sequence-to-sequence tasks",
+          "Parallelization: No sequential dependency like RNNs"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "Scaled Dot-Product Attention",
+          "formula": "Attention(Q, K, V) = softmax((Q × K^T) / √d_k) × V",
+          "explanation": "Compute attention weights by comparing queries with keys, scale by √d_k, then weight the values",
+          "variables": {
+            "Q": "Query matrix (what we're looking for)",
+            "K": "Key matrix (what each position offers)",
+            "V": "Value matrix (actual content to aggregate)",
+            "d_k": "Dimension of keys (scaling factor prevents large dot products)"
+          }
+        },
+        {
+          "name": "Multi-Head Attention",
+          "formula": "MultiHead(Q, K, V) = Concat(head_1, ..., head_h) × W^O",
+          "explanation": "Run h attention heads in parallel, concatenate results, and project",
+          "note": "Each head learns different relationships: syntax, semantics, etc."
+        },
+        {
+          "name": "Positional Encoding",
+          "formula": "PE(pos, 2i) = sin(pos / 10000^(2i/d))\nPE(pos, 2i+1) = cos(pos / 10000^(2i/d))",
+          "explanation": "Sine/cosine functions inject position information at different frequencies",
+          "variables": {
+            "pos": "Position in sequence",
+            "i": "Dimension index",
+            "d": "Model dimension"
+          }
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "import torch\nimport torch.nn as nn\nimport math\n\nclass MultiHeadAttention(nn.Module):\n    \"\"\"Multi-head self-attention mechanism\"\"\"\n    def __init__(self, d_model, num_heads):\n        super().__init__()\n        assert d_model % num_heads == 0\n        \n        self.d_model = d_model\n        self.num_heads = num_heads\n        self.d_k = d_model // num_heads\n        \n        # Linear projections for Q, K, V\n        self.W_q = nn.Linear(d_model, d_model)\n        self.W_k = nn.Linear(d_model, d_model)\n        self.W_v = nn.Linear(d_model, d_model)\n        self.W_o = nn.Linear(d_model, d_model)\n        \n    def scaled_dot_product_attention(self, Q, K, V, mask=None):\n        \"\"\"Compute attention scores and weighted values\"\"\"\n        # Q, K, V: (batch, num_heads, seq_len, d_k)\n        scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(self.d_k)\n        \n        if mask is not None:\n            scores = scores.masked_fill(mask == 0, -1e9)\n        \n        attention_weights = torch.softmax(scores, dim=-1)\n        output = torch.matmul(attention_weights, V)\n        return output, attention_weights\n    \n    def forward(self, query, key, value, mask=None):\n        batch_size = query.size(0)\n        \n        # Linear projections and reshape to (batch, num_heads, seq_len, d_k)\n        Q = self.W_q(query).view(batch_size, -1, self.num_heads, self.d_k).transpose(1, 2)\n        K = self.W_k(key).view(batch_size, -1, self.num_heads, self.d_k).transpose(1, 2)\n        V = self.W_v(value).view(batch_size, -1, self.num_heads, self.d_k).transpose(1, 2)\n        \n        # Apply attention\n        x, attention_weights = self.scaled_dot_product_attention(Q, K, V, mask)\n        \n        # Concatenate heads and project\n        x = x.transpose(1, 2).contiguous().view(batch_size, -1, self.d_model)\n        output = self.W_o(x)\n        \n        return output, attention_weights\n\nclass TransformerEncoderLayer(nn.Module):\n    \"\"\"Single Transformer encoder layer\"\"\"\n    def __init__(self, d_model, num_heads, d_ff, dropout=0.1):\n        super().__init__()\n        self.self_attn = MultiHeadAttention(d_model, num_heads)\n        self.feed_forward = nn.Sequential(\n            nn.Linear(d_model, d_ff),\n            nn.ReLU(),\n            nn.Linear(d_ff, d_model)\n        )\n        self.norm1 = nn.LayerNorm(d_model)\n        self.norm2 = nn.LayerNorm(d_model)\n        self.dropout = nn.Dropout(dropout)\n        \n    def forward(self, x, mask=None):\n        # Self-attention with residual connection\n        attn_output, _ = self.self_attn(x, x, x, mask)\n        x = self.norm1(x + self.dropout(attn_output))\n        \n        # Feed-forward with residual connection\n        ff_output = self.feed_forward(x)\n        x = self.norm2(x + self.dropout(ff_output))\n        \n        return x\n\n# Example usage\nd_model = 512\nnum_heads = 8\nd_ff = 2048\nbatch_size = 2\nseq_len = 10\n\n# Create random input\nx = torch.randn(batch_size, seq_len, d_model)\n\n# Create encoder layer\nencoder_layer = TransformerEncoderLayer(d_model, num_heads, d_ff)\n\n# Forward pass\noutput = encoder_layer(x)\nprint(f\"Input shape: {x.shape}\")\nprint(f\"Output shape: {output.shape}\")\nprint(f\"Output shape matches input: {output.shape == x.shape}\")",
+        "explanation": "This implements the core Transformer encoder layer with multi-head attention, feed-forward network, residual connections, and layer normalization - the building blocks of models like BERT and GPT."
+      },
+      "advantages": [
+        "Parallelization: Process entire sequence simultaneously (vs RNN sequential)",
+        "Long-range dependencies: Attention connects distant tokens directly",
+        "Interpretability: Attention weights show which tokens matter",
+        "Scalability: Architecture scales well to massive datasets",
+        "Flexibility: Same architecture works for many tasks (NLP, vision, speech)"
+      ],
+      "common_pitfalls": [
+        "Quadratic complexity: O(n²) memory/compute for sequence length n",
+        "Positional encoding: Forgetting to add position information",
+        "Attention mask: Not masking padding tokens in variable-length sequences",
+        "Dimension mismatch: d_model must be divisible by num_heads"
+      ],
+      "interview_tips": [
+        "Contrast with RNNs: parallel vs sequential, no vanishing gradients",
+        "Explain attention mechanism intuitively before math",
+        "Mention real applications: GPT, BERT, DALL-E, AlphaFold",
+        "Discuss efficiency challenges and solutions (sparse attention, linear attention)"
+      ],
+      "variants": {
+        "Encoder-only (BERT)": "For understanding tasks: classification, NER, QA",
+        "Decoder-only (GPT)": "For generation tasks: text completion, chat",
+        "Encoder-Decoder (T5)": "For translation, summarization",
+        "Vision Transformer (ViT)": "Apply to image patches",
+        "Sparse Transformers": "Reduce O(n²) complexity with sparse attention patterns"
+      },
+      "related_topics": ["Attention Mechanism", "BERT", "GPT", "Self-Attention", "Positional Encoding"],
+      "further_reading": [
+        "Attention Is All You Need (Vaswani et al., 2017)",
+        "The Illustrated Transformer (Jay Alammar)",
+        "Transformers from Scratch (Peter Bloem)"
+      ]
+    },
+    "Attention Mechanism": {
+      "category": "Deep Learning",
+      "difficulty": "Medium",
+      "importance": "Critical",
+      "prerequisites": ["Neural Networks", "Sequence Models", "Softmax"],
+      "layman_explanation": {
+        "title": "What is Attention in Simple Terms?",
+        "content": "When you read a sentence like 'The animal didn't cross the street because it was too tired,' your brain automatically focuses on 'animal' when interpreting 'it.' Attention mechanisms let neural networks do the same - they learn which parts of the input to focus on when processing each element. Instead of treating all inputs equally, attention assigns different importance weights, focusing on what's relevant."
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of Attention",
+        "content": "Attention is a mechanism that allows models to dynamically weigh the importance of different input elements when producing an output. Given a query, it computes similarity scores with all keys, normalizes them via softmax to get attention weights, then produces a weighted sum of values. This creates a context vector that focuses on relevant information. Attention solved the bottleneck problem in seq2seq models where all input information was compressed into a fixed-size vector.",
+        "key_concepts": [
+          "Query-Key-Value paradigm: Query searches, Keys are searched, Values are retrieved",
+          "Attention weights: Learned importance scores (sum to 1)",
+          "Context vector: Weighted combination of values",
+          "Alignment: Which input positions are relevant for each output",
+          "Self-attention: Queries, keys, values all from same sequence"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "Attention Score (Dot Product)",
+          "formula": "score(q, k_i) = q · k_i",
+          "explanation": "Measure similarity between query and each key using dot product",
+          "note": "Higher score = more relevant"
+        },
+        {
+          "name": "Attention Weights",
+          "formula": "α_i = exp(score(q, k_i)) / Σ_j exp(score(q, k_j))",
+          "explanation": "Normalize scores with softmax to get probability distribution",
+          "note": "Weights sum to 1 across all positions"
+        },
+        {
+          "name": "Context Vector",
+          "formula": "context = Σ(α_i × v_i)",
+          "explanation": "Weighted sum of values using attention weights",
+          "variables": {
+            "α_i": "Attention weight for position i",
+            "v_i": "Value at position i"
+          }
+        },
+        {
+          "name": "Scaled Dot-Product (Transformer)",
+          "formula": "Attention(Q,K,V) = softmax((QK^T)/√d_k)V",
+          "explanation": "Batch version with scaling to prevent large gradients",
+          "note": "Scaling by √d_k keeps variance stable"
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "import torch\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass SimpleAttention(nn.Module):\n    \"\"\"Basic attention mechanism for seq2seq models\"\"\"\n    def __init__(self, hidden_dim):\n        super().__init__()\n        self.hidden_dim = hidden_dim\n        # Learn to combine query and key\n        self.attn = nn.Linear(hidden_dim * 2, hidden_dim)\n        self.v = nn.Linear(hidden_dim, 1, bias=False)\n        \n    def forward(self, query, keys):\n        \"\"\"\n        Args:\n            query: decoder hidden state (batch, hidden_dim)\n            keys: encoder outputs (batch, seq_len, hidden_dim)\n        Returns:\n            context: weighted combination (batch, hidden_dim)\n            attention_weights: (batch, seq_len)\n        \"\"\"\n        batch_size = keys.size(0)\n        seq_len = keys.size(1)\n        \n        # Repeat query for each key position\n        query_repeated = query.unsqueeze(1).repeat(1, seq_len, 1)\n        # (batch, seq_len, hidden_dim)\n        \n        # Compute attention scores\n        # Concatenate query with each key\n        combined = torch.cat([query_repeated, keys], dim=2)\n        # (batch, seq_len, hidden_dim*2)\n        \n        energy = torch.tanh(self.attn(combined))\n        # (batch, seq_len, hidden_dim)\n        \n        scores = self.v(energy).squeeze(2)\n        # (batch, seq_len)\n        \n        # Normalize scores to get attention weights\n        attention_weights = F.softmax(scores, dim=1)\n        # (batch, seq_len)\n        \n        # Compute context as weighted sum\n        context = torch.bmm(attention_weights.unsqueeze(1), keys)\n        # (batch, 1, hidden_dim)\n        context = context.squeeze(1)\n        # (batch, hidden_dim)\n        \n        return context, attention_weights\n\nclass ScaledDotProductAttention(nn.Module):\n    \"\"\"Transformer-style scaled dot-product attention\"\"\"\n    def __init__(self, temperature):\n        super().__init__()\n        self.temperature = temperature  # sqrt(d_k)\n        \n    def forward(self, Q, K, V, mask=None):\n        \"\"\"\n        Args:\n            Q: queries (batch, n_queries, d_k)\n            K: keys (batch, n_keys, d_k)\n            V: values (batch, n_keys, d_v)\n            mask: optional mask (batch, n_queries, n_keys)\n        \"\"\"\n        # Compute attention scores\n        scores = torch.matmul(Q, K.transpose(-2, -1)) / self.temperature\n        # (batch, n_queries, n_keys)\n        \n        # Apply mask if provided (e.g., for padding)\n        if mask is not None:\n            scores = scores.masked_fill(mask == 0, -1e9)\n        \n        # Attention weights\n        attn_weights = F.softmax(scores, dim=-1)\n        \n        # Compute weighted values\n        output = torch.matmul(attn_weights, V)\n        # (batch, n_queries, d_v)\n        \n        return output, attn_weights\n\n# Example usage\nbatch_size = 2\nseq_len = 5\nhidden_dim = 8\n\n# Seq2seq attention\nquery = torch.randn(batch_size, hidden_dim)  # Current decoder state\nkeys = torch.randn(batch_size, seq_len, hidden_dim)  # Encoder outputs\n\nattn = SimpleAttention(hidden_dim)\ncontext, weights = attn(query, keys)\n\nprint(\"Seq2Seq Attention:\")\nprint(f\"Context shape: {context.shape}\")  # (batch, hidden_dim)\nprint(f\"Weights shape: {weights.shape}\")  # (batch, seq_len)\nprint(f\"Weights sum to 1: {weights.sum(dim=1)}\")  # Should be [1, 1]\nprint(f\"Attention weights: {weights[0]}\\n\")\n\n# Transformer-style attention\nQ = torch.randn(batch_size, 3, hidden_dim)  # 3 queries\nK = torch.randn(batch_size, seq_len, hidden_dim)\nV = torch.randn(batch_size, seq_len, hidden_dim)\n\nscaled_attn = ScaledDotProductAttention(temperature=hidden_dim**0.5)\noutput, attn_weights = scaled_attn(Q, K, V)\n\nprint(\"Scaled Dot-Product Attention:\")\nprint(f\"Output shape: {output.shape}\")  # (batch, 3, hidden_dim)\nprint(f\"Attention weights shape: {attn_weights.shape}\")  # (batch, 3, seq_len)",
+        "explanation": "Two attention implementations: (1) Basic seq2seq attention with learned alignment, (2) Scaled dot-product attention used in Transformers. Both compute context vectors by weighting values based on query-key similarity."
+      },
+      "types": {
+        "Self-Attention": "Query, key, value from same sequence - model relates positions to each other",
+        "Cross-Attention": "Query from one sequence, key/value from another - used in encoder-decoder",
+        "Additive (Bahdanau)": "Learned weight vector scores query-key concatenation",
+        "Multiplicative (Luong)": "Dot product or general matrix for scoring",
+        "Multi-Head": "Multiple attention heads learn different relationships in parallel"
+      },
+      "common_pitfalls": [
+        "Not scaling dot products: Large values cause vanishing gradients in softmax",
+        "Forgetting mask for padding: Attends to meaningless padding tokens",
+        "Broadcasting errors: Dimension mismatches in batch operations",
+        "Expensive computation: O(n²) for sequence length n"
+      ],
+      "interview_tips": [
+        "Start with the 'pronoun resolution' example",
+        "Draw the Query-Key-Value diagram",
+        "Explain why attention > fixed context vector in seq2seq",
+        "Mention applications: translation, summarization, image captioning"
+      ],
+      "related_topics": ["Transformers", "Seq2Seq Models", "BERT", "Multi-Head Attention"],
+      "further_reading": [
+        "Neural Machine Translation by Jointly Learning to Align and Translate (Bahdanau et al., 2015)",
+        "Effective Approaches to Attention-based NMT (Luong et al., 2015)",
+        "Attention? Attention! (Lilian Weng blog)"
+      ]
+    },
+    "PyTorch Tensors": {
+      "category": "PyTorch",
+      "difficulty": "Easy",
+      "importance": "Critical",
+      "prerequisites": ["NumPy Arrays", "Linear Algebra Basics"],
+      "layman_explanation": {
+        "title": "What are PyTorch Tensors in Simple Terms?",
+        "content": "Think of tensors as multi-dimensional spreadsheets of numbers. A 1D tensor is a list of numbers (like [1, 2, 3]), a 2D tensor is a table (like an Excel sheet), and 3D+ tensors are stacks of tables. The magic is that tensors can live on GPUs for super-fast computation and automatically track operations for calculating gradients - which is how neural networks learn. They're like NumPy arrays with superpowers for deep learning."
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of PyTorch Tensors",
+        "content": "Tensors are the fundamental data structure in PyTorch - multi-dimensional arrays similar to NumPy ndarrays but with key differences: (1) GPU acceleration support via CUDA, (2) automatic differentiation through computational graph tracking, (3) optimized for deep learning operations. Tensors have a dtype (data type), shape (dimensions), and device (CPU/GPU). Operations on tensors are element-wise by default and support broadcasting for efficient computation.",
+        "key_concepts": [
+          "Shape: Dimensions of the tensor (e.g., (3, 4, 5) = 3D tensor)",
+          "Device: CPU or CUDA GPU where tensor lives",
+          "dtype: Data type (float32, int64, etc.) - affects precision and memory",
+          "requires_grad: Whether to track operations for backpropagation",
+          "View vs Clone: Memory-shared reference vs independent copy"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "Broadcasting Rule",
+          "formula": "If trailing dimensions match or one is 1, broadcasting happens",
+          "explanation": "Tensors of different shapes can be operated together if dimensions are compatible",
+          "example": "(3, 1, 5) + (3, 4, 5) → (3, 4, 5)"
+        },
+        {
+          "name": "Memory Layout",
+          "formula": "stride[i] = product of all dimensions after i",
+          "explanation": "Determines how to traverse tensor in memory",
+          "note": "Contiguous tensors have optimal memory access patterns"
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "import torch\nimport numpy as np\n\n# ====== Creating Tensors ======\nprint(\"=== Creating Tensors ===\")\n\n# From Python lists\nt1 = torch.tensor([1, 2, 3])\nprint(f\"From list: {t1}\")\n\n# Common constructors\nzeros = torch.zeros(2, 3)  # 2x3 tensor of zeros\nones = torch.ones(2, 3)    # 2x3 tensor of ones\nrand = torch.rand(2, 3)    # Random values [0, 1)\nrandn = torch.randn(2, 3)  # Normal distribution N(0, 1)\n\nprint(f\"\\nZeros:\\n{zeros}\")\nprint(f\"\\nRandom:\\n{rand}\")\n\n# From NumPy (shares memory!)\nnp_array = np.array([1, 2, 3])\ntorch_tensor = torch.from_numpy(np_array)\nprint(f\"\\nFrom NumPy: {torch_tensor}\")\n\n# ====== Tensor Properties ======\nprint(\"\\n=== Tensor Properties ===\")\nt = torch.randn(3, 4, 5)\nprint(f\"Shape: {t.shape}\")  # or t.size()\nprint(f\"Dtype: {t.dtype}\")\nprint(f\"Device: {t.device}\")\nprint(f\"Total elements: {t.numel()}\")\nprint(f\"Requires grad: {t.requires_grad}\")\n\n# ====== Device Management (CPU/GPU) ======\nprint(\"\\n=== Device Management ===\")\nif torch.cuda.is_available():\n    device = torch.device('cuda')\n    t_gpu = torch.randn(3, 3, device=device)  # Create directly on GPU\n    t_cpu = torch.randn(3, 3)\n    t_cpu_to_gpu = t_cpu.to(device)  # Move to GPU\n    print(f\"GPU tensor device: {t_gpu.device}\")\nelse:\n    print(\"CUDA not available - using CPU\")\n    device = torch.device('cpu')\n\n# ====== Basic Operations ======\nprint(\"\\n=== Basic Operations ===\")\na = torch.tensor([1.0, 2.0, 3.0])\nb = torch.tensor([4.0, 5.0, 6.0])\n\nprint(f\"Addition: {a + b}\")\nprint(f\"Element-wise multiply: {a * b}\")\nprint(f\"Dot product: {torch.dot(a, b)}\")\nprint(f\"Mean: {a.mean()}\")\nprint(f\"Sum: {a.sum()}\")\n\n# Matrix operations\nmatrix_a = torch.randn(3, 4)\nmatrix_b = torch.randn(4, 5)\nmatmul = torch.matmul(matrix_a, matrix_b)  # or matrix_a @ matrix_b\nprint(f\"\\nMatrix multiply: {matrix_a.shape} @ {matrix_b.shape} = {matmul.shape}\")\n\n# ====== Broadcasting ======\nprint(\"\\n=== Broadcasting ===\")\nx = torch.ones(3, 4)\ny = torch.tensor([1, 2, 3, 4])  # Shape (4,)\nresult = x + y  # y broadcasts to (3, 4)\nprint(f\"Shape {x.shape} + shape {y.shape} = shape {result.shape}\")\n\n# ====== Indexing and Slicing ======\nprint(\"\\n=== Indexing and Slicing ===\")\nt = torch.arange(12).reshape(3, 4)\nprint(f\"\\nTensor:\\n{t}\")\nprint(f\"First row: {t[0]}\")\nprint(f\"First column: {t[:, 0]}\")\nprint(f\"2x2 submatrix: {t[:2, :2]}\")\n\n# Boolean indexing\nmask = t > 5\nprint(f\"\\nElements > 5: {t[mask]}\")\n\n# ====== Reshaping ======\nprint(\"\\n=== Reshaping ===\")\nt = torch.arange(12)\nprint(f\"Original: {t.shape}\")\nprint(f\"Reshape to (3, 4): {t.reshape(3, 4).shape}\")\nprint(f\"Reshape to (2, 2, 3): {t.reshape(2, 2, 3).shape}\")\nprint(f\"Infer dimension (-1): {t.reshape(3, -1).shape}\")  # Auto-compute last dim\n\n# View (shares memory) vs Clone (copy)\nt_view = t.view(3, 4)  # Shares memory with t\nt_clone = t.clone()    # Independent copy\nprint(f\"\\nView shares memory: {t_view.data_ptr() == t.data_ptr()}\")\nprint(f\"Clone is independent: {t_clone.data_ptr() == t.data_ptr()}\")\n\n# ====== Gradients ======\nprint(\"\\n=== Gradients ===\")\nx = torch.tensor([2.0], requires_grad=True)\ny = x ** 2 + 3 * x + 1\nprint(f\"y = x^2 + 3x + 1, x=2: y={y.item():.1f}\")\n\ny.backward()  # Compute gradients\nprint(f\"dy/dx = 2x + 3 = 2*2 + 3 = {x.grad.item():.1f}\")\n\n# ====== Common Gotchas ======\nprint(\"\\n=== Common Patterns ===\")\n\n# In-place operations (end with _)\nt = torch.ones(2, 2)\nt.add_(1)  # In-place: modifies t\nprint(f\"After add_(1): {t}\")\n\n# Detach from computational graph\nx = torch.tensor([1.0], requires_grad=True)\ny = x * 2\nz = y.detach()  # No longer tracks gradients\nprint(f\"y requires_grad: {y.requires_grad}\")\nprint(f\"z requires_grad: {z.requires_grad}\")\n\n# Convert to NumPy (shares memory!)\nt = torch.ones(3)\nnp_array = t.numpy()\nprint(f\"\\nTensor to NumPy shares memory: {np_array}\")\n\n# Get scalar value\nscalar_tensor = torch.tensor(42.0)\nprint(f\"Extract scalar: {scalar_tensor.item()}\")",
+        "explanation": "Comprehensive tensor operations: creation, device management, operations, indexing, reshaping, and gradients. Master these fundamentals for all PyTorch work."
+      },
+      "common_patterns": {
+        "Batch processing": "Add batch dimension: (seq_len, features) → (batch, seq_len, features)",
+        "Dimension manipulation": "unsqueeze() adds dimension, squeeze() removes size-1 dimensions",
+        "Type conversion": "tensor.float(), tensor.long(), tensor.to(dtype)",
+        "Concatenation": "torch.cat([t1, t2], dim=0) for same-shape tensors",
+        "Stacking": "torch.stack([t1, t2], dim=0) adds new dimension"
+      },
+      "common_pitfalls": [
+        "Mixing dtypes: torch.float32 + torch.int64 causes errors",
+        "Device mismatch: CPU tensor + GPU tensor fails - use .to(device)",
+        "View on non-contiguous: Use .contiguous().view() if error",
+        "Forgetting requires_grad: Won't compute gradients without it",
+        "NumPy conversion shares memory: Modifying one affects the other"
+      ],
+      "interview_tips": [
+        "Know difference between view() and reshape() (contiguity)",
+        "Explain broadcasting rules clearly",
+        "Mention GPU acceleration as key advantage over NumPy",
+        "Discuss memory efficiency: views vs clones",
+        "Common operations: matmul (@), element-wise (*, +)"
+      ],
+      "related_topics": ["NumPy", "Autograd", "CUDA", "Broadcasting"],
+      "further_reading": [
+        "PyTorch Tensors Documentation",
+        "PyTorch Internals (Edward Yang blog)",
+        "Broadcasting Semantics in PyTorch"
+      ]
+    },
+    "Autograd": {
+      "category": "PyTorch",
+      "difficulty": "Medium",
+      "importance": "Critical",
+      "prerequisites": ["PyTorch Tensors", "Backpropagation", "Chain Rule"],
+      "layman_explanation": {
+        "title": "What is Autograd in Simple Terms?",
+        "content": "Imagine you're doing a complex calculation on a calculator, and suddenly someone asks 'what's the rate of change at this point?' Normally you'd have to manually figure out the derivative. Autograd is like a magic calculator that automatically remembers every operation you did and can instantly tell you the derivative. For neural networks, this means PyTorch automatically computes all the gradients needed for backpropagation - you just call .backward() and it handles the calculus for you!"
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of Autograd",
+        "content": "Autograd is PyTorch's automatic differentiation engine that powers neural network training. It builds a dynamic computational graph (DAG) during the forward pass, recording all operations on tensors with requires_grad=True. When you call .backward(), it traverses this graph in reverse order, applying the chain rule to compute gradients. The system uses reverse-mode automatic differentiation (backpropagation) which is efficient for scenarios where outputs are fewer than inputs - perfect for neural networks where we have many parameters but few loss values.",
+        "key_concepts": [
+          "Computational Graph: DAG of operations built dynamically during forward pass",
+          "requires_grad: Flag to enable gradient tracking for a tensor",
+          "grad_fn: Function that created the tensor (for backprop)",
+          "backward(): Computes gradients using reverse-mode autodiff",
+          "Dynamic vs Static Graphs: PyTorch builds graph on-the-fly (unlike TensorFlow 1.x)"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "Chain Rule Application",
+          "formula": "∂L/∂x = (∂L/∂y) × (∂y/∂x)",
+          "explanation": "Autograd applies chain rule automatically through computational graph",
+          "note": "This compounds through multiple operations in the graph"
+        },
+        {
+          "name": "Gradient Accumulation",
+          "formula": "x.grad += ∂L/∂x",
+          "explanation": "Gradients accumulate with each .backward() call - must zero them manually",
+          "note": "Important for mini-batch training"
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "import torch\nimport torch.nn as nn\n\n# ====== Basic Autograd ======\nprint(\"=== Basic Autograd ===\")\n\n# Enable gradient tracking\nx = torch.tensor([2.0], requires_grad=True)\nprint(f\"x requires_grad: {x.requires_grad}\")\n\n# Forward pass - autograd builds computational graph\ny = x ** 2 + 3 * x + 1\nprint(f\"\\ny = x^2 + 3x + 1\")\nprint(f\"y value: {y.item()}\")\nprint(f\"y.grad_fn: {y.grad_fn}\")  # Shows the operation that created y\n\n# Backward pass - compute gradients\ny.backward()  # Computes dy/dx\nprint(f\"\\ndy/dx = 2x + 3\")\nprint(f\"At x=2: dy/dx = {x.grad.item()}\")\nprint(f\"Expected: 2*2 + 3 = 7\")\n\n# ====== Computational Graph Visualization ======\nprint(\"\\n=== Computational Graph ===\")\na = torch.tensor([2.0], requires_grad=True)\nb = torch.tensor([3.0], requires_grad=True)\n\nc = a + b        # c = 5\nd = c * a        # d = 10\ne = d ** 2       # e = 100\nloss = e.mean()  # loss = 100\n\nprint(\"Graph: a, b → c → d → e → loss\")\nprint(f\"loss = ((a + b) * a)^2 = {loss.item()}\")\n\nloss.backward()\nprint(f\"\\n∂loss/∂a = {a.grad.item()}\")  # 160\nprint(f\"∂loss/∂b = {b.grad.item()}\")    # 80\n\n# ====== Multi-output Backward ======\nprint(\"\\n=== Multi-output Backward ===\")\nx = torch.tensor([1.0, 2.0, 3.0], requires_grad=True)\ny = x ** 2  # Element-wise: [1, 4, 9]\n\n# For non-scalar, must provide gradient argument\ngrad_output = torch.tensor([1.0, 1.0, 1.0])  # Gradient from next layer\ny.backward(grad_output)\nprint(f\"x: {x.data}\")\nprint(f\"y = x^2: {y.data}\")\nprint(f\"dy/dx = 2x: {x.grad}\")\n\n# ====== Gradient Accumulation ======\nprint(\"\\n=== Gradient Accumulation ===\")\nx = torch.tensor([2.0], requires_grad=True)\n\n# First backward pass\ny1 = x ** 2\ny1.backward()\nprint(f\"After first backward: x.grad = {x.grad.item()}\")\n\n# Second backward pass - gradients ACCUMULATE!\ny2 = x * 3\ny2.backward()\nprint(f\"After second backward: x.grad = {x.grad.item()}\")  # 4 + 3 = 7\n\n# Must zero gradients manually\nx.grad.zero_()\nprint(f\"After zero_(): x.grad = {x.grad.item()}\")\n\n# ====== no_grad Context ======\nprint(\"\\n=== Disabling Gradients ===\")\nx = torch.tensor([2.0], requires_grad=True)\n\n# Inference mode - don't track gradients (faster, less memory)\nwith torch.no_grad():\n    y = x ** 2 + 1\n    print(f\"Inside no_grad: y.requires_grad = {y.requires_grad}\")\n\ny2 = x ** 2 + 1\nprint(f\"Outside no_grad: y2.requires_grad = {y2.requires_grad}\")\n\n# Alternative: @torch.no_grad() decorator\n@torch.no_grad()\ndef inference(x):\n    return x ** 2 + 1\n\nresult = inference(x)\nprint(f\"Function with @no_grad: result.requires_grad = {result.requires_grad}\")\n\n# ====== Detach ======\nprint(\"\\n=== Detaching Tensors ===\")\nx = torch.tensor([2.0], requires_grad=True)\ny = x ** 2\n\n# Detach y from computational graph\nz = y.detach()\nprint(f\"y.requires_grad: {y.requires_grad}\")\nprint(f\"z.requires_grad: {z.requires_grad}\")\nprint(f\"z shares data with y: {z.data_ptr() == y.data_ptr()}\")\n\n# ====== Gradient of Non-leaf Tensors ======\nprint(\"\\n=== Retaining Gradients ===\")\nx = torch.tensor([2.0], requires_grad=True)\ny = x ** 2\nz = y * 3\n\n# By default, only leaf tensors retain gradients\nz.backward()\nprint(f\"x.grad (leaf): {x.grad}\")\nprint(f\"y.grad (non-leaf): {y.grad}\")  # None by default!\n\n# To keep intermediate gradients\nx = torch.tensor([2.0], requires_grad=True)\ny = x ** 2\ny.retain_grad()  # Explicitly keep gradient\nz = y * 3\nz.backward()\nprint(f\"\\nWith retain_grad():\")\nprint(f\"y.grad: {y.grad}\")\n\n# ====== Custom Backward Pass ======\nprint(\"\\n=== Custom Autograd Function ===\")\n\nclass MyReLU(torch.autograd.Function):\n    \"\"\"Custom ReLU with custom backward\"\"\"\n    @staticmethod\n    def forward(ctx, input):\n        ctx.save_for_backward(input)  # Save for backward pass\n        return input.clamp(min=0)\n    \n    @staticmethod\n    def backward(ctx, grad_output):\n        input, = ctx.saved_tensors\n        grad_input = grad_output.clone()\n        grad_input[input < 0] = 0  # Gradient is 0 where input < 0\n        return grad_input\n\n# Use custom function\nx = torch.tensor([-1.0, 2.0, -3.0, 4.0], requires_grad=True)\ny = MyReLU.apply(x)\nloss = y.sum()\nloss.backward()\n\nprint(f\"Input: {x.data}\")\nprint(f\"ReLU output: {y.data}\")\nprint(f\"Gradients: {x.grad}\")  # [0, 1, 0, 1]\n\n# ====== Practical Training Loop ======\nprint(\"\\n=== Training Loop Example ===\")\n\n# Simple linear model\nmodel = nn.Linear(10, 1)\noptimizer = torch.optim.SGD(model.parameters(), lr=0.01)\n\nfor epoch in range(3):\n    # Dummy data\n    x = torch.randn(5, 10)  # batch_size=5, features=10\n    y_true = torch.randn(5, 1)\n    \n    # Forward pass\n    y_pred = model(x)\n    loss = ((y_pred - y_true) ** 2).mean()\n    \n    # Backward pass\n    optimizer.zero_grad()  # MUST zero gradients!\n    loss.backward()        # Compute gradients\n    optimizer.step()       # Update weights\n    \n    print(f\"Epoch {epoch}, Loss: {loss.item():.4f}\")\n\nprint(\"\\n=== Key Takeaways ===\")\nprint(\"1. Always use optimizer.zero_grad() before backward()\")\nprint(\"2. Use torch.no_grad() for inference to save memory\")\nprint(\"3. Only leaf tensors keep gradients by default\")\nprint(\"4. Computational graph is built dynamically in PyTorch\")\nprint(\"5. .backward() applies reverse-mode autodiff (chain rule)\")",
+        "explanation": "Complete autograd tutorial: basic differentiation, computational graphs, gradient accumulation, no_grad contexts, custom functions, and training loops. Essential for understanding how PyTorch trains models."
+      },
+      "common_patterns": {
+        "Training step": "optimizer.zero_grad() → loss.backward() → optimizer.step()",
+        "Inference": "with torch.no_grad(): predictions = model(x)",
+        "Gradient clipping": "torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)",
+        "Freeze layers": "for param in model.layer.parameters(): param.requires_grad = False",
+        "Checkpoint gradients": "torch.utils.checkpoint for memory-efficient training"
+      },
+      "common_pitfalls": [
+        "Forgetting zero_grad(): Gradients accumulate causing wrong updates",
+        "Calling backward() twice on same graph: Graph is freed after backward()",
+        "Not using no_grad() for inference: Wastes memory tracking unnecessary gradients",
+        "In-place operations break autograd: Use non-inplace versions during training",
+        "RuntimeError: grad can be implicitly created only for scalar outputs"
+      ],
+      "interview_tips": [
+        "Explain dynamic vs static computational graphs (PyTorch vs TensorFlow 1.x)",
+        "Know when to use .detach() vs torch.no_grad()",
+        "Understand gradient accumulation for large batch training",
+        "Mention memory efficiency: gradients for non-leaf tensors discarded",
+        "Discuss reverse-mode autodiff efficiency for neural networks"
+      ],
+      "related_topics": ["Backpropagation", "PyTorch Tensors", "Optimizers", "Computational Graphs"],
+      "further_reading": [
+        "PyTorch Autograd Documentation",
+        "Automatic Differentiation in PyTorch (blog)",
+        "How Computational Graphs Work (Lilian Weng)"
+      ]
+    },
+    "LoRA": {
+      "category": "Generative AI",
+      "difficulty": "Advanced",
+      "importance": "Critical",
+      "prerequisites": ["Fine-tuning", "Transformers", "Linear Algebra"],
+      "layman_explanation": {
+        "title": "What is LoRA in Simple Terms?",
+        "content": "Imagine you have a massive encyclopedia (a pretrained LLM) and want to teach it about a new topic. Instead of rewriting the entire encyclopedia (expensive!), you create small 'sticky notes' with corrections and additions for specific pages. LoRA (Low-Rank Adaptation) does exactly this - it adds small trainable 'adapter' layers to a frozen model. You only train these tiny adapters (< 1% of parameters), which is 100x faster and cheaper than retraining the whole model, yet achieves similar quality."
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of LoRA",
+        "content": "LoRA is a Parameter-Efficient Fine-Tuning (PEFT) technique that freezes pretrained weights and injects trainable low-rank matrices into each layer. For a weight matrix W, instead of updating W directly, LoRA adds a low-rank decomposition: W' = W + BA, where B and A are much smaller matrices (rank r << d). The key insight: weight updates during fine-tuning have low 'intrinsic rank,' so we can represent them compactly. This reduces trainable parameters by 10,000x for large models (e.g., 7B → 4M params) while matching full fine-tuning quality.",
+        "key_concepts": [
+          "Low-rank decomposition: Large update ΔW ≈ BA where B,A are small matrices",
+          "Frozen backbone: Original model weights stay unchanged",
+          "Rank r: Hyperparameter controlling adapter capacity (typical: 4-64)",
+          "Scaling factor α: Controls magnitude of LoRA updates (α/r)",
+          "Merge-able: Can merge BA into W for zero inference overhead"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "LoRA Weight Update",
+          "formula": "h = Wx + (α/r) × BAx",
+          "explanation": "Forward pass adds low-rank update to frozen weights",
+          "variables": {
+            "W": "Frozen pretrained weights (d × k)",
+            "B": "Trainable matrix (d × r)",
+            "A": "Trainable matrix (r × k)",
+            "r": "Rank (bottleneck dimension, r << min(d, k))",
+            "α": "Scaling hyperparameter"
+          }
+        },
+        {
+          "name": "Parameter Reduction",
+          "formula": "Reduction = (d × k) / (d × r + r × k) ≈ d / (2r) for d ≈ k",
+          "explanation": "Factor by which parameters are reduced vs full fine-tuning",
+          "example": "d=4096, r=8: 4096/16 = 256× fewer parameters"
+        },
+        {
+          "name": "Merged Weights (Inference)",
+          "formula": "W_merged = W + (α/r) × BA",
+          "explanation": "Can merge adapters into base weights for deployment",
+          "note": "Zero inference latency overhead after merging"
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "import torch\nimport torch.nn as nn\n\nclass LoRALayer(nn.Module):\n    \"\"\"LoRA adapter for a linear layer\"\"\"\n    def __init__(self, in_features, out_features, rank=4, alpha=1):\n        super().__init__()\n        self.rank = rank\n        self.alpha = alpha\n        \n        # Low-rank matrices\n        self.lora_A = nn.Parameter(torch.randn(in_features, rank))\n        self.lora_B = nn.Parameter(torch.zeros(rank, out_features))\n        \n        # Initialize A with Kaiming, B with zeros\n        nn.init.kaiming_uniform_(self.lora_A, a=5**0.5)\n        \n    def forward(self, x):\n        \"\"\"Compute low-rank update: BA × x\"\"\"\n        # x: (batch, in_features)\n        lora_output = (self.alpha / self.rank) * (x @ self.lora_A @ self.lora_B)\n        return lora_output\n\nclass LinearWithLoRA(nn.Module):\n    \"\"\"Linear layer with LoRA adapter\"\"\"\n    def __init__(self, in_features, out_features, rank=4, alpha=1):\n        super().__init__()\n        \n        # Frozen pretrained weights\n        self.linear = nn.Linear(in_features, out_features)\n        for param in self.linear.parameters():\n            param.requires_grad = False  # Freeze!\n        \n        # Trainable LoRA adapter\n        self.lora = LoRALayer(in_features, out_features, rank, alpha)\n        \n    def forward(self, x):\n        # Combine frozen weights + LoRA adaptation\n        return self.linear(x) + self.lora(x)\n    \n    def merge_weights(self):\n        \"\"\"Merge LoRA into base weights for inference\"\"\"\n        with torch.no_grad():\n            # Compute LoRA update: (α/r) × BA\n            lora_weight = (self.lora.alpha / self.lora.rank) * \\\n                         (self.lora.lora_A @ self.lora.lora_B).T\n            \n            # Merge into linear layer\n            self.linear.weight.data += lora_weight\n            \n            # Zero out LoRA (no longer needed)\n            self.lora.lora_A.data.zero_()\n            self.lora.lora_B.data.zero_()\n\n# ====== Example: Fine-tune a simple model with LoRA ======\nprint(\"=== LoRA Fine-Tuning Example ===\")\n\n# Pretrained model (frozen)\nclass PretrainedModel(nn.Module):\n    def __init__(self, d_model=512):\n        super().__init__()\n        self.layer1 = nn.Linear(d_model, d_model)\n        self.layer2 = nn.Linear(d_model, d_model)\n        self.output = nn.Linear(d_model, 10)  # 10 classes\n        \n    def forward(self, x):\n        x = torch.relu(self.layer1(x))\n        x = torch.relu(self.layer2(x))\n        return self.output(x)\n\n# Add LoRA adapters\nclass ModelWithLoRA(nn.Module):\n    def __init__(self, d_model=512, rank=8, alpha=16):\n        super().__init__()\n        # Replace linear layers with LoRA versions\n        self.layer1 = LinearWithLoRA(d_model, d_model, rank, alpha)\n        self.layer2 = LinearWithLoRA(d_model, d_model, rank, alpha)\n        self.output = LinearWithLoRA(d_model, 10, rank, alpha)\n        \n    def forward(self, x):\n        x = torch.relu(self.layer1(x))\n        x = torch.relu(self.layer2(x))\n        return self.output(x)\n\nmodel = ModelWithLoRA(d_model=512, rank=8, alpha=16)\n\n# Count parameters\ntotal_params = sum(p.numel() for p in model.parameters())\ntrainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)\n\nprint(f\"Total parameters: {total_params:,}\")\nprint(f\"Trainable (LoRA) parameters: {trainable_params:,}\")\nprint(f\"Trainable percentage: {100 * trainable_params / total_params:.2f}%\")\nprint(f\"Parameter reduction: {total_params / trainable_params:.1f}x\")\n\n# Training (only LoRA params update!)\noptimizer = torch.optim.AdamW(\n    [p for p in model.parameters() if p.requires_grad],\n    lr=1e-4\n)\n\n# Dummy training\nx = torch.randn(4, 512)  # batch=4\ny = torch.randint(0, 10, (4,))  # labels\n\nloss_fn = nn.CrossEntropyLoss()\n\nfor epoch in range(3):\n    optimizer.zero_grad()\n    logits = model(x)\n    loss = loss_fn(logits, y)\n    loss.backward()\n    optimizer.step()\n    print(f\"Epoch {epoch}, Loss: {loss.item():.4f}\")\n\n# ====== Merge adapters for inference ======\nprint(\"\\n=== Merging LoRA Adapters ===\")\nmodel.layer1.merge_weights()\nmodel.layer2.merge_weights()\nmodel.output.merge_weights()\nprint(\"LoRA weights merged into base model!\")\nprint(\"Now has zero inference overhead.\")\n\n# ====== Using PEFT library (industry standard) ======\nprint(\"\\n=== Using PEFT Library ===\")\nprint(\"In practice, use the PEFT library:\")\nprint(\"\"\"\nfrom peft import get_peft_model, LoraConfig, TaskType\n\nconfig = LoraConfig(\n    r=8,                              # Rank\n    lora_alpha=16,                    # Scaling\n    target_modules=[\"q_proj\", \"v_proj\"],  # Which layers\n    lora_dropout=0.1,\n    bias=\"none\",\n    task_type=TaskType.CAUSAL_LM\n)\n\nmodel = get_peft_model(base_model, config)\nmodel.print_trainable_parameters()\n# Output: trainable params: 4M || all params: 7B || trainable%: 0.06%\n\"\"\")\n\nprint(\"\\n=== Key Advantages ===\")\nprint(\"1. 10,000× fewer trainable parameters than full fine-tuning\")\nprint(\"2. Much lower GPU memory (no optimizer states for frozen params)\")\nprint(\"3. Faster training (fewer gradients to compute)\")\nprint(\"4. Multiple adapters: swap for different tasks on same base model\")\nprint(\"5. Merge-able: zero inference overhead\")",
+        "explanation": "Complete LoRA implementation showing: custom LoRA layer, integration with frozen weights, parameter counting, training, and merging. In practice, use the PEFT library for production code."
+      },
+      "hyperparameters": {
+        "Rank (r)": "Bottleneck dimension. Higher = more capacity but more params. Typical: 4-64. Start with 8.",
+        "Alpha (α)": "Scaling factor. Often α = 2×r. Controls update magnitude. Typical: 16 for r=8.",
+        "Target modules": "Which layers get LoRA. For LLMs: attention Q,V projections work best.",
+        "Dropout": "Optional dropout for LoRA layers. Typical: 0.05-0.1.",
+        "Learning rate": "Usually higher than full fine-tuning. Typical: 1e-4 to 3e-4."
+      },
+      "common_pitfalls": [
+        "Forgetting to freeze base model: Set requires_grad=False on pretrained weights",
+        "Wrong learning rate: LoRA needs higher LR than full fine-tuning",
+        "Rank too low: r=1 or 2 often insufficient. Start with r=8.",
+        "Not using alpha scaling: Can cause instability if alpha/r ratio is wrong",
+        "Target wrong modules: For LLMs, Q and V projections most important"
+      ],
+      "interview_tips": [
+        "Explain the low-rank hypothesis: updates have intrinsic low rank",
+        "Compare to full fine-tuning: 100-1000× cheaper, similar quality",
+        "Mention multi-adapter use case: one base model, many task adapters",
+        "Discuss merging: zero inference cost after combining weights",
+        "Know QLoRA extension: combines LoRA with 4-bit quantization"
+      ],
+      "related_topics": ["QLoRA", "PEFT", "Fine-tuning", "Adapters", "Transfer Learning"],
+      "further_reading": [
+        "LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)",
+        "PEFT Library Documentation",
+        "Understanding LoRA (Sebastian Raschka blog)"
+      ]
+    },
+    "RLHF": {
+      "category": "Generative AI",
+      "difficulty": "Advanced",
+      "importance": "Very High",
+      "prerequisites": ["Reinforcement Learning Basics", "LLMs", "Policy Gradients"],
+      "layman_explanation": {
+        "title": "What is RLHF in Simple Terms?",
+        "content": "Imagine training a dog: first you teach basic commands (pretraining), then you give treats for good behavior and corrections for bad behavior (RLHF). For ChatGPT, humans rank different responses (like 'thumbs up/down'), teaching the AI which outputs are helpful, harmless, and honest. The AI learns to generate responses that humans prefer, not just responses that are grammatically correct. This is how we go from a raw LLM that completes text to a helpful assistant that follows instructions."
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of RLHF",
+        "content": "Reinforcement Learning from Human Feedback (RLHF) is a three-stage process to align LLMs with human preferences: (1) Supervised Fine-Tuning (SFT): Fine-tune base LLM on high-quality human demonstrations. (2) Reward Model Training: Train a model to predict human preferences by learning from pairwise comparisons of outputs. (3) RL Optimization: Use PPO (Proximal Policy Optimization) to fine-tune the SFT model to maximize reward while staying close to the original policy (KL divergence penalty prevents mode collapse). The reward model acts as a learned proxy for human feedback, enabling scalable optimization.",
+        "key_concepts": [
+          "Reward Model: Neural network that predicts human preference scores",
+          "PPO (Proximal Policy Optimization): RL algorithm for stable policy updates",
+          "KL Divergence Penalty: Keeps policy close to SFT model (prevents reward hacking)",
+          "Bradley-Terry Model: Pairwise preference likelihood for reward training",
+          "Value Function: Estimates expected future reward (used in PPO)"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "Bradley-Terry Preference Model",
+          "formula": "P(y_w > y_l | x) = σ(r(x, y_w) - r(x, y_l))",
+          "explanation": "Probability that human prefers y_w over y_l given prompt x",
+          "variables": {
+            "y_w": "Preferred (winner) response",
+            "y_l": "Dispreferred (loser) response",
+            "r(x, y)": "Reward model score",
+            "σ": "Sigmoid function"
+          }
+        },
+        {
+          "name": "Reward Model Loss",
+          "formula": "L_RM = -E[log σ(r(x, y_w) - r(x, y_l))]",
+          "explanation": "Train reward model to rank preferred responses higher",
+          "note": "Trained on dataset of human preference comparisons"
+        },
+        {
+          "name": "PPO Objective",
+          "formula": "L_PPO = E[min(ratio × A, clip(ratio, 1-ε, 1+ε) × A)] - β × KL(π || π_ref)",
+          "explanation": "Maximize reward while staying close to reference policy",
+          "variables": {
+            "ratio": "π_θ(y|x) / π_ref(y|x) - new vs old policy",
+            "A": "Advantage function (how good is action vs average)",
+            "ε": "Clip range (e.g., 0.2)",
+            "β": "KL penalty coefficient",
+            "π_ref": "Reference policy (SFT model)"
+          }
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "import torch\nimport torch.nn as nn\nimport torch.nn.functional as F\nfrom torch.distributions import Categorical\n\n# Note: This is a simplified educational example.\n# Production RLHF uses libraries like TRL (Transformer Reinforcement Learning)\n\nclass RewardModel(nn.Module):\n    \"\"\"Reward model: LLM + scalar head\"\"\"\n    def __init__(self, base_model, hidden_size):\n        super().__init__()\n        self.base_model = base_model  # e.g., GPT-2\n        # Freeze base model (optional: fine-tune last few layers)\n        for param in self.base_model.parameters():\n            param.requires_grad = False\n        \n        # Scalar reward head\n        self.reward_head = nn.Linear(hidden_size, 1)\n        \n    def forward(self, input_ids, attention_mask=None):\n        \"\"\"Compute scalar reward for sequence\"\"\"\n        # Get last hidden state\n        outputs = self.base_model(\n            input_ids, \n            attention_mask=attention_mask,\n            output_hidden_states=True\n        )\n        last_hidden = outputs.hidden_states[-1]  # (batch, seq_len, hidden)\n        \n        # Use last token's hidden state\n        last_token_hidden = last_hidden[:, -1, :]  # (batch, hidden)\n        \n        # Predict scalar reward\n        reward = self.reward_head(last_token_hidden)  # (batch, 1)\n        return reward.squeeze(-1)  # (batch,)\n\ndef compute_preference_loss(reward_model, prompt_ids, chosen_ids, rejected_ids):\n    \"\"\"Bradley-Terry preference loss\"\"\"\n    # Concatenate prompt + response\n    chosen_input = torch.cat([prompt_ids, chosen_ids], dim=1)\n    rejected_input = torch.cat([prompt_ids, rejected_ids], dim=1)\n    \n    # Compute rewards\n    r_chosen = reward_model(chosen_input)\n    r_rejected = reward_model(rejected_input)\n    \n    # Bradley-Terry loss: -log σ(r_chosen - r_rejected)\n    loss = -F.logsigmoid(r_chosen - r_rejected).mean()\n    return loss\n\ndef compute_ppo_loss(policy_model, ref_model, states, actions, \n                     old_log_probs, rewards, values, \n                     clip_range=0.2, kl_coef=0.1):\n    \"\"\"Simplified PPO loss for RLHF\"\"\"\n    # Get new action log probabilities\n    logits = policy_model(states)\n    dist = Categorical(logits=logits)\n    new_log_probs = dist.log_prob(actions)\n    \n    # Compute ratio: π_new / π_old\n    ratio = torch.exp(new_log_probs - old_log_probs)\n    \n    # Compute advantages\n    advantages = rewards - values\n    \n    # Clipped surrogate objective\n    surr1 = ratio * advantages\n    surr2 = torch.clamp(ratio, 1 - clip_range, 1 + clip_range) * advantages\n    policy_loss = -torch.min(surr1, surr2).mean()\n    \n    # KL divergence penalty (stay close to reference model)\n    ref_logits = ref_model(states)\n    ref_dist = Categorical(logits=ref_logits)\n    kl_div = torch.distributions.kl_divergence(dist, ref_dist).mean()\n    \n    # Combined loss\n    total_loss = policy_loss + kl_coef * kl_div\n    \n    return total_loss, policy_loss, kl_div\n\n# ====== RLHF Pipeline Pseudocode ======\nprint(\"=== RLHF Three-Stage Process ===\")\nprint(\"\"\"\nStage 1: Supervised Fine-Tuning (SFT)\n--------------------------------------\n# Fine-tune base LLM on high-quality demonstrations\nfor batch in sft_dataset:  # e.g., 10k instruction-response pairs\n    prompt, response = batch\n    loss = model.compute_loss(prompt, response)\n    loss.backward()\n    optimizer.step()\n\nStage 2: Reward Model Training\n-------------------------------\n# Train reward model on human preference comparisons\nfor batch in preference_dataset:  # e.g., 50k pairwise comparisons\n    prompt, chosen, rejected = batch\n    r_chosen = reward_model(prompt + chosen)\n    r_rejected = reward_model(prompt + rejected)\n    # Bradley-Terry loss\n    loss = -log(sigmoid(r_chosen - r_rejected))\n    loss.backward()\n    optimizer.step()\n\nStage 3: RL Optimization (PPO)\n------------------------------\nref_model = sft_model.copy()  # Reference policy (frozen)\nref_model.eval()\n\nfor iteration in range(num_iterations):\n    # Generate responses\n    prompts = sample_prompts()\n    responses = policy_model.generate(prompts)\n    \n    # Get rewards from reward model\n    rewards = reward_model(prompts, responses)\n    \n    # Compute advantages\n    values = value_model(prompts, responses)\n    advantages = rewards - values\n    \n    # PPO update\n    for epoch in range(ppo_epochs):\n        loss = compute_ppo_loss(\n            policy_model, ref_model, \n            prompts, responses, advantages,\n            clip_range=0.2, kl_coef=0.1\n        )\n        loss.backward()\n        optimizer.step()\n\"\"\")\n\nprint(\"\\n=== Using TRL Library (Industry Standard) ===\")\nprint(\"\"\"\nfrom trl import PPOTrainer, PPOConfig, AutoModelForCausalLMWithValueHead\nfrom transformers import AutoTokenizer\n\n# Load models\nmodel = AutoModelForCausalLMWithValueHead.from_pretrained(\"gpt2\")\nref_model = AutoModelForCausalLMWithValueHead.from_pretrained(\"gpt2\")\nreward_model = AutoModelForSequenceClassification.from_pretrained(\"reward-model\")\n\n# Configure PPO\nconfig = PPOConfig(\n    batch_size=16,\n    learning_rate=1e-5,\n    cliprange=0.2,\n    kl_penalty=\"kl\",\n    init_kl_coef=0.2,\n)\n\n# Create trainer\nppo_trainer = PPOTrainer(\n    config=config,\n    model=model,\n    ref_model=ref_model,\n    tokenizer=tokenizer,\n)\n\n# Training loop\nfor batch in dataset:\n    prompts = batch[\"prompt\"]\n    \n    # Generate responses\n    responses = ppo_trainer.generate(prompts)\n    \n    # Get rewards\n    rewards = reward_model(prompts, responses)\n    \n    # PPO step\n    stats = ppo_trainer.step(prompts, responses, rewards)\n    print(f\"Reward: {stats['ppo/mean_scores']:.2f}\")\n\"\"\")\n\nprint(\"\\n=== Key Insights ===\")\nprint(\"1. RLHF aligns LLMs with human preferences, not just likelihood\")\nprint(\"2. Reward model = learned proxy for human feedback (scalable)\")\nprint(\"3. KL penalty critical: prevents reward hacking and mode collapse\")\nprint(\"4. PPO: stable RL algorithm for updating policy incrementally\")\nprint(\"5. Alternative: DPO (Direct Preference Optimization) - no RL needed!\")",
+        "explanation": "Simplified RLHF implementation showing reward model training and PPO loss. In production, use the TRL library which handles the complexity of RL training for LLMs."
+      },
+      "three_stages": {
+        "1. Supervised Fine-Tuning (SFT)": "Fine-tune base LLM on ~10-100k high-quality instruction-response pairs written by humans",
+        "2. Reward Model Training": "Train reward model on ~50-100k pairwise comparisons where humans rank model outputs",
+        "3. RL Optimization (PPO)": "Use RL to optimize SFT model to maximize reward model scores while staying close to SFT policy"
+      },
+      "common_pitfalls": [
+        "Mode collapse: Model exploits reward model weaknesses. Fix: KL penalty",
+        "Reward hacking: Policy finds adversarial examples. Fix: Diverse prompts, robust RM",
+        "Catastrophic forgetting: Model loses pretraining knowledge. Fix: KL penalty to reference",
+        "Poor reward model: Garbage in, garbage out. Need high-quality preference data",
+        "Training instability: PPO can be unstable. Tune clip_range, KL coefficient carefully"
+      ],
+      "interview_tips": [
+        "Explain all three stages clearly: SFT → Reward Model → PPO",
+        "Emphasize KL penalty importance: prevents reward hacking",
+        "Contrast with supervised learning: optimizes for preferences, not likelihood",
+        "Mention alternatives: DPO (simpler, no RL), RLAIF (AI feedback)",
+        "Discuss reward model limitations: distribution shift, adversarial inputs"
+      ],
+      "alternatives": {
+        "DPO (Direct Preference Optimization)": "Optimizes policy directly from preferences - no separate reward model or RL",
+        "RLAIF": "Use AI (another LLM) to provide feedback instead of humans",
+        "Constitutional AI": "Model critiques and revises own outputs based on principles",
+        "Best-of-N sampling": "Simple baseline: generate N samples, pick highest reward"
+      },
+      "related_topics": ["PPO", "Reward Modeling", "DPO", "LLM Alignment", "Constitutional AI"],
+      "further_reading": [
+        "InstructGPT: Training language models to follow instructions with human feedback (OpenAI, 2022)",
+        "Learning to summarize from human feedback (OpenAI, 2020)",
+        "Illustrating RLHF (HuggingFace blog)"
+      ]
+    },
+    "Adam Optimizer": {
+      "category": "Deep Learning",
+      "difficulty": "Medium",
+      "importance": "Critical",
+      "prerequisites": ["Gradient Descent", "Momentum", "Learning Rate"],
+      "layman_explanation": {
+        "title": "What is Adam Optimizer in Simple Terms?",
+        "content": "Imagine riding a bike downhill: Momentum helps you accelerate and smooth out bumps, while adaptive braking lets you slow down on steep parts and speed up on gentle slopes. Adam (Adaptive Moment Estimation) combines both ideas for training neural networks. It maintains a 'velocity' for each parameter (momentum) AND adjusts the learning rate per-parameter based on gradient history (adaptive learning). This makes training much faster and more stable than basic gradient descent - which is why Adam is the default optimizer for 90% of deep learning."
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of Adam",
+        "content": "Adam combines two techniques: (1) Momentum - maintains exponentially decaying average of past gradients to accelerate training and reduce oscillation, (2) RMSprop - maintains exponentially decaying average of past squared gradients to adapt learning rate per parameter. For each parameter, Adam computes both first moment (mean) and second moment (variance) of gradients, with bias correction for early iterations. The effective learning rate is higher for parameters with small, consistent gradients and lower for those with large/noisy gradients. This adaptive behavior makes Adam robust to hyperparameter choice and widely applicable.",
+        "key_concepts": [
+          "First moment (m): Exponential moving average of gradients (momentum)",
+          "Second moment (v): Exponential moving average of squared gradients (adaptive LR)",
+          "Bias correction: Compensates for zero initialization in early steps",
+          "Adaptive learning rates: Per-parameter LR based on gradient history",
+          "Hyperparameters: β1 (momentum decay), β2 (variance decay), ε (numerical stability)"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "First Moment Update",
+          "formula": "m_t = β1 × m_{t-1} + (1 - β1) × g_t",
+          "explanation": "Exponential moving average of gradients (momentum term)",
+          "variables": {
+            "m_t": "First moment estimate at step t",
+            "g_t": "Gradient at step t",
+            "β1": "Decay rate for first moment (typical: 0.9)"
+          }
+        },
+        {
+          "name": "Second Moment Update",
+          "formula": "v_t = β2 × v_{t-1} + (1 - β2) × g_t²",
+          "explanation": "Exponential moving average of squared gradients (for adaptive LR)",
+          "variables": {
+            "v_t": "Second moment estimate at step t",
+            "β2": "Decay rate for second moment (typical: 0.999)"
+          }
+        },
+        {
+          "name": "Bias Correction",
+          "formula": "m̂_t = m_t / (1 - β1^t),  v̂_t = v_t / (1 - β2^t)",
+          "explanation": "Correct bias toward zero from initialization",
+          "note": "Important in early training steps"
+        },
+        {
+          "name": "Parameter Update",
+          "formula": "θ_t = θ_{t-1} - α × m̂_t / (√v̂_t + ε)",
+          "explanation": "Update with adaptive per-parameter learning rate",
+          "variables": {
+            "α": "Learning rate (typical: 1e-3 to 3e-3)",
+            "ε": "Small constant for numerical stability (typical: 1e-8)"
+          }
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "import torch\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nclass AdamOptimizer:\n    \"\"\"Adam optimizer from scratch\"\"\"\n    def __init__(self, params, lr=1e-3, beta1=0.9, beta2=0.999, eps=1e-8):\n        self.params = list(params)\n        self.lr = lr\n        self.beta1 = beta1\n        self.beta2 = beta2\n        self.eps = eps\n        self.t = 0  # Time step\n        \n        # Initialize first and second moments for each parameter\n        self.m = [torch.zeros_like(p) for p in self.params]\n        self.v = [torch.zeros_like(p) for p in self.params]\n    \n    def step(self):\n        \"\"\"Perform single optimization step\"\"\"\n        self.t += 1\n        \n        for i, param in enumerate(self.params):\n            if param.grad is None:\n                continue\n            \n            grad = param.grad.data\n            \n            # Update biased first moment estimate\n            self.m[i] = self.beta1 * self.m[i] + (1 - self.beta1) * grad\n            \n            # Update biased second moment estimate\n            self.v[i] = self.beta2 * self.v[i] + (1 - self.beta2) * grad**2\n            \n            # Bias correction\n            m_hat = self.m[i] / (1 - self.beta1**self.t)\n            v_hat = self.v[i] / (1 - self.beta2**self.t)\n            \n            # Update parameters\n            param.data -= self.lr * m_hat / (torch.sqrt(v_hat) + self.eps)\n    \n    def zero_grad(self):\n        \"\"\"Zero all gradients\"\"\"\n        for param in self.params:\n            if param.grad is not None:\n                param.grad.zero_()\n\n# ====== Compare optimizers on a simple problem ======\nprint(\"=== Comparing Optimizers ===\")\n\n# Rosenbrock function: f(x,y) = (1-x)^2 + 100(y-x^2)^2\ndef rosenbrock(x, y):\n    return (1 - x)**2 + 100 * (y - x**2)**2\n\ndef train_optimizer(optimizer_class, **kwargs):\n    \"\"\"Train with given optimizer and return trajectory\"\"\"\n    x = torch.tensor([-1.0, -1.0], requires_grad=True)  # Start far from minimum\n    optimizer = optimizer_class([x], **kwargs)\n    \n    trajectory = [x.detach().clone().numpy()]\n    \n    for _ in range(200):\n        optimizer.zero_grad()\n        loss = rosenbrock(x[0], x[1])\n        loss.backward()\n        optimizer.step()\n        trajectory.append(x.detach().clone().numpy())\n    \n    return np.array(trajectory)\n\n# Compare SGD vs Adam\nsgd_traj = train_optimizer(torch.optim.SGD, lr=0.001)\nadam_traj = train_optimizer(AdamOptimizer, lr=0.01)\n\nprint(f\"SGD final position: {sgd_traj[-1]}\")\nprint(f\"Adam final position: {adam_traj[-1]}\")\nprint(f\"Optimal position: [1.0, 1.0]\")\nprint(f\"\\nAdam converges much faster and closer to optimum!\")\n\n# ====== Using PyTorch's Adam ======\nprint(\"\\n=== Using PyTorch Adam ===\")\n\nimport torch.nn as nn\n\n# Simple neural network\nmodel = nn.Sequential(\n    nn.Linear(10, 50),\n    nn.ReLU(),\n    nn.Linear(50, 1)\n)\n\n# Create Adam optimizer\noptimizer = torch.optim.Adam(\n    model.parameters(),\n    lr=1e-3,           # Learning rate\n    betas=(0.9, 0.999), # (beta1, beta2)\n    eps=1e-8,          # Epsilon for numerical stability\n    weight_decay=0     # L2 regularization (optional)\n)\n\nprint(\"Optimizer configured:\")\nprint(optimizer)\n\n# Training loop\nfor epoch in range(5):\n    # Dummy data\n    x = torch.randn(32, 10)\n    y = torch.randn(32, 1)\n    \n    # Forward pass\n    pred = model(x)\n    loss = nn.MSELoss()(pred, y)\n    \n    # Backward pass\n    optimizer.zero_grad()\n    loss.backward()\n    \n    # Update weights with Adam\n    optimizer.step()\n    \n    print(f\"Epoch {epoch}, Loss: {loss.item():.4f}\")\n\n# ====== Adam Variants ======\nprint(\"\\n=== Adam Variants ===\")\n\n# AdamW: Decoupled weight decay (better than L2 regularization)\noptimizer_adamw = torch.optim.AdamW(\n    model.parameters(),\n    lr=1e-3,\n    weight_decay=0.01  # Decoupled weight decay\n)\nprint(\"AdamW: Separates weight decay from gradient - often better generalization\")\n\n# Adafactor: Memory-efficient version (for large models)\nprint(\"Adafactor: Reduces memory by not storing full m, v (good for LLMs)\")\n\n# ====== Learning Rate Scheduling with Adam ======\nprint(\"\\n=== Learning Rate Scheduling ===\")\n\noptimizer = torch.optim.Adam(model.parameters(), lr=1e-3)\n\n# Reduce LR on plateau\nscheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(\n    optimizer, mode='min', factor=0.5, patience=5\n)\n\n# Cosine annealing\nscheduler_cosine = torch.optim.lr_scheduler.CosineAnnealingLR(\n    optimizer, T_max=100\n)\n\nprint(\"Common schedulers:\")\nprint(\"- ReduceLROnPlateau: Reduce when validation loss plateaus\")\nprint(\"- CosineAnnealing: Smooth decrease following cosine curve\")\nprint(\"- OneCycleLR: Triangular LR for super-convergence\")\n\n# ====== Best Practices ======\nprint(\"\\n=== Adam Best Practices ===\")\nprint(\"1. Default hyperparameters work well: lr=1e-3, β1=0.9, β2=0.999\")\nprint(\"2. Use AdamW instead of Adam + weight_decay\")\nprint(\"3. For transformers: lr=1e-4, warmup, cosine decay\")\nprint(\"4. For vision: SGD with momentum often better than Adam\")\nprint(\"5. Learning rate most important: tune between 1e-5 and 1e-2\")\n\n# ====== Common Issues ======\nprint(\"\\n=== Troubleshooting ===\")\nprint(\"Loss oscillating: Lower learning rate\")\nprint(\"Slow convergence: Increase learning rate or use warmup\")\nprint(\"Poor generalization: Use AdamW with weight_decay=0.01\")\nprint(\"Out of memory: Use gradient accumulation or Adafactor\")",
+        "explanation": "Complete Adam implementation from scratch plus practical PyTorch usage, variants (AdamW), scheduling, and best practices. Adam is the go-to optimizer for most deep learning tasks."
+      },
+      "comparison_with_others": {
+        "SGD": "Simpler, better generalization for vision, but slower convergence and requires careful LR tuning",
+        "SGD + Momentum": "Faster than SGD, still used for CNNs, but Adam often more robust",
+        "RMSprop": "Adam's predecessor, lacks momentum term, rarely used now",
+        "AdamW": "Adam with decoupled weight decay - preferred over vanilla Adam",
+        "Adafactor": "Memory-efficient Adam variant for very large models (LLMs)"
+      },
+      "common_pitfalls": [
+        "Using Adam with weight_decay parameter: Use AdamW instead for proper L2 reg",
+        "Not using warmup for transformers: Start with low LR, gradually increase",
+        "Same LR for all tasks: Vision often needs lower LR than NLP",
+        "Ignoring numerical stability: Default eps=1e-8 works, but 1e-7 sometimes better",
+        "Forgetting bias correction: Critical for early training stability"
+      ],
+      "interview_tips": [
+        "Explain two main components: momentum (first moment) + adaptive LR (second moment)",
+        "Know when to use Adam vs SGD: Adam for NLP/general, SGD for vision",
+        "Discuss AdamW improvement: decoupled weight decay",
+        "Mention bias correction purpose: fixes zero initialization bias",
+        "Typical hyperparameters: lr=1e-3, β1=0.9, β2=0.999"
+      ],
+      "related_topics": ["Gradient Descent", "Momentum", "RMSprop", "AdamW", "Learning Rate Scheduling"],
+      "further_reading": [
+        "Adam: A Method for Stochastic Optimization (Kingma & Ba, 2014)",
+        "Decoupled Weight Decay Regularization (AdamW paper)",
+        "Why Adam Works (Sebastian Ruder blog)"
+      ]
+    },
+    "Activation Functions": {
+      "category": "Deep Learning",
+      "difficulty": "Easy",
+      "importance": "Critical",
+      "prerequisites": ["Neural Networks", "Derivatives"],
+      "layman_explanation": {
+        "title": "What are Activation Functions in Simple Terms?",
+        "content": "Neurons in your brain don't simply pass signals through - they 'fire' only when input reaches a threshold, and the signal strength varies. Activation functions do the same for artificial neurons: they introduce non-linearity, determining when and how strongly a neuron activates. Without them, stacking multiple layers would be pointless (linear + linear = still linear). With activations like ReLU ('fire fully if input > 0, else off'), networks can learn complex patterns like recognizing faces or understanding language."
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of Activation Functions",
+        "content": "Activation functions are non-linear transformations applied to neuron outputs, enabling neural networks to learn non-linear relationships. After computing weighted sum z = Wx + b, we apply activation: a = σ(z). Key properties: (1) Non-linearity - allows learning complex functions, (2) Differentiability - enables backpropagation, (3) Range - affects gradient flow and training dynamics. Different activations suit different tasks: ReLU for hidden layers (fast, no vanishing gradients), sigmoid/tanh for gates (bounded output), softmax for classification (probability distribution).",
+        "key_concepts": [
+          "Non-linearity: Breaks linear constraint, enables learning complex functions",
+          "Gradient flow: Derivative affects how well gradients backpropagate",
+          "Saturation: When gradients → 0 (sigmoid/tanh saturate, ReLU doesn't)",
+          "Computational efficiency: Simple functions (ReLU) train faster",
+          "Output range: Bounded [0,1] vs unbounded [0,∞)"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "ReLU (Rectified Linear Unit)",
+          "formula": "σ(z) = max(0, z),  σ'(z) = {1 if z > 0, 0 if z ≤ 0}",
+          "explanation": "Most popular. Simple, fast, avoids vanishing gradients",
+          "pros": "No saturation for z > 0, computationally cheap, sparse activation",
+          "cons": "Dead neurons (gradient=0 for z≤0), unbounded output"
+        },
+        {
+          "name": "Sigmoid",
+          "formula": "σ(z) = 1/(1 + e^(-z)),  σ'(z) = σ(z)(1 - σ(z))",
+          "explanation": "Squashes input to (0, 1). Used for binary classification, gates (LSTM)",
+          "pros": "Bounded output, smooth gradient, interpretable as probability",
+          "cons": "Vanishing gradients (saturates at extremes), not zero-centered"
+        },
+        {
+          "name": "Tanh (Hyperbolic Tangent)",
+          "formula": "σ(z) = (e^z - e^(-z))/(e^z + e^(-z)),  σ'(z) = 1 - σ(z)²",
+          "explanation": "Squashes to (-1, 1). Zero-centered (better than sigmoid)",
+          "pros": "Zero-centered, stronger gradients than sigmoid",
+          "cons": "Still saturates, more expensive than ReLU"
+        },
+        {
+          "name": "Leaky ReLU",
+          "formula": "σ(z) = {z if z > 0, αz if z ≤ 0},  typically α = 0.01",
+          "explanation": "Fixes dying ReLU by allowing small negative gradient",
+          "pros": "No dead neurons, still simple and fast",
+          "cons": "Extra hyperparameter α"
+        },
+        {
+          "name": "GELU (Gaussian Error Linear Unit)",
+          "formula": "σ(z) ≈ 0.5z(1 + tanh(√(2/π)(z + 0.044715z³)))",
+          "explanation": "Smooth approximation of ReLU. Used in BERT, GPT",
+          "pros": "Smooth, non-monotonic, state-of-art for transformers",
+          "cons": "More expensive to compute"
+        },
+        {
+          "name": "Softmax (Multi-class)",
+          "formula": "σ(z_i) = e^(z_i) / Σ_j e^(z_j)",
+          "explanation": "Converts logits to probability distribution (sums to 1)",
+          "usage": "Output layer for multi-class classification only"
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "import torch\nimport torch.nn as nn\nimport torch.nn.functional as F\nimport numpy as np\nimport matplotlib.pyplot as plt\n\n# ====== Implement activations from scratch ======\nclass ActivationFunctions:\n    @staticmethod\n    def relu(x):\n        return np.maximum(0, x)\n    \n    @staticmethod\n    def sigmoid(x):\n        return 1 / (1 + np.exp(-x))\n    \n    @staticmethod\n    def tanh(x):\n        return np.tanh(x)\n    \n    @staticmethod\n    def leaky_relu(x, alpha=0.01):\n        return np.where(x > 0, x, alpha * x)\n    \n    @staticmethod\n    def softmax(x):\n        exp_x = np.exp(x - np.max(x))  # Subtract max for numerical stability\n        return exp_x / exp_x.sum()\n\n# ====== Visualize activations ======\nprint(\"=== Activation Functions Visualization ===\")\n\nx = np.linspace(-5, 5, 100)\n\nplt.figure(figsize=(15, 4))\n\n# ReLU\nplt.subplot(1, 4, 1)\nplt.plot(x, ActivationFunctions.relu(x))\nplt.title('ReLU')\nplt.grid(True)\nplt.axhline(0, color='black', linewidth=0.5)\nplt.axvline(0, color='black', linewidth=0.5)\n\n# Sigmoid\nplt.subplot(1, 4, 2)\nplt.plot(x, ActivationFunctions.sigmoid(x))\nplt.title('Sigmoid')\nplt.grid(True)\nplt.axhline(0, color='black', linewidth=0.5)\nplt.axvline(0, color='black', linewidth=0.5)\n\n# Tanh\nplt.subplot(1, 4, 3)\nplt.plot(x, ActivationFunctions.tanh(x))\nplt.title('Tanh')\nplt.grid(True)\nplt.axhline(0, color='black', linewidth=0.5)\nplt.axvline(0, color='black', linewidth=0.5)\n\n# Leaky ReLU\nplt.subplot(1, 4, 4)\nplt.plot(x, ActivationFunctions.leaky_relu(x))\nplt.title('Leaky ReLU')\nplt.grid(True)\nplt.axhline(0, color='black', linewidth=0.5)\nplt.axvline(0, color='black', linewidth=0.5)\n\nplt.tight_layout()\n\n# ====== Using in PyTorch ======\nprint(\"\\n=== Using Activations in PyTorch ===\")\n\n# Method 1: As layers\nmodel = nn.Sequential(\n    nn.Linear(10, 50),\n    nn.ReLU(),           # ReLU as layer\n    nn.Linear(50, 20),\n    nn.LeakyReLU(0.01),  # Leaky ReLU\n    nn.Linear(20, 1),\n    nn.Sigmoid()         # Sigmoid output\n)\n\nprint(\"Model with activation layers:\")\nprint(model)\n\n# Method 2: Functional API (no parameters)\nx = torch.randn(5, 10)\nz1 = F.relu(x)        # Functional ReLU\nz2 = F.sigmoid(x)     # Functional sigmoid\nz3 = F.gelu(x)        # GELU (used in transformers)\n\nprint(f\"\\nInput shape: {x.shape}\")\nprint(f\"After ReLU: {z1.shape}\")\n\n# ====== Softmax for classification ======\nprint(\"\\n=== Softmax for Multi-class Classification ===\")\n\nlogits = torch.tensor([2.0, 1.0, 0.1])  # Raw scores\nprobs = F.softmax(logits, dim=0)        # Convert to probabilities\n\nprint(f\"Logits: {logits}\")\nprint(f\"Probabilities: {probs}\")\nprint(f\"Sum of probabilities: {probs.sum()}\")\nprint(f\"Most likely class: {torch.argmax(probs)}\")\n\n# ====== Impact on gradients ======\nprint(\"\\n=== Gradient Flow ===\")\n\nx = torch.linspace(-3, 3, 100, requires_grad=True)\n\n# ReLU gradients\ny_relu = F.relu(x)\ny_relu.sum().backward()\ngrad_relu = x.grad.clone()\nx.grad.zero_()\n\n# Sigmoid gradients\ny_sigmoid = torch.sigmoid(x)\ny_sigmoid.sum().backward()\ngrad_sigmoid = x.grad.clone()\n\nprint(\"ReLU: Gradient is 1 for x > 0, 0 for x ≤ 0\")\nprint(f\"ReLU grad at x=2: {grad_relu[75]:.2f}\")  # Should be 1\nprint(f\"ReLU grad at x=-2: {grad_relu[25]:.2f}\") # Should be 0\n\nprint(\"\\nSigmoid: Gradient vanishes at extremes\")\nprint(f\"Sigmoid grad at x=0: {grad_sigmoid[50]:.4f}\")  # Max gradient ~0.25\nprint(f\"Sigmoid grad at x=3: {grad_sigmoid[90]:.4f}\")  # Nearly 0 (vanishing!)\n\n# ====== Choosing activation functions ======\nprint(\"\\n=== When to Use Each Activation ===\")\nprint(\"\"\"\nHidden Layers:\n  - ReLU: Default choice. Fast, no vanishing gradients.\n  - Leaky ReLU / PReLU: If you have dying neurons.\n  - GELU: For transformers (BERT, GPT).\n  - Tanh: Rarely used now (RNNs/LSTMs internally).\n\nOutput Layer:\n  - Sigmoid: Binary classification (0/1 probability).\n  - Softmax: Multi-class classification (probability distribution).\n  - Linear (no activation): Regression (unbounded output).\n  - Tanh: Output in range (-1, 1).\n\nDO NOT use:\n  - Sigmoid/Tanh in hidden layers of deep networks (vanishing gradients).\n  - ReLU in output layer for classification (use sigmoid/softmax).\n\"\"\")\n\n# ====== Common issues ======\nprint(\"\\n=== Common Problems ===\")\nprint(\"Dying ReLU: Many neurons output 0 permanently\")\nprint(\"  Fix: Lower learning rate, use Leaky ReLU, check initialization\\n\")\nprint(\"Vanishing gradients: Loss stops decreasing\")\nprint(\"  Fix: Use ReLU instead of sigmoid/tanh in hidden layers\\n\")\nprint(\"Exploding activations: Outputs become very large\")\nprint(\"  Fix: Batch normalization, gradient clipping, check LR\")\n\n# ====== Advanced: Custom activation ======\nprint(\"\\n=== Custom Activation Function ===\")\n\nclass Swish(nn.Module):\n    \"\"\"Swish: x * sigmoid(x). Self-gated activation.\"\"\"\n    def forward(self, x):\n        return x * torch.sigmoid(x)\n\nmodel_custom = nn.Sequential(\n    nn.Linear(10, 20),\n    Swish(),  # Custom activation\n    nn.Linear(20, 1)\n)\n\nprint(\"Custom Swish activation: f(x) = x * σ(x)\")\nprint(\"Used in some state-of-art models (EfficientNet)\")",
+        "explanation": "Comprehensive guide to activation functions: implementations, visualizations, PyTorch usage, gradient analysis, and selection guidelines. Essential knowledge for any neural network design."
+      },
+      "when_to_use": {
+        "ReLU": "Default for hidden layers. Fast, effective, most widely used.",
+        "Leaky ReLU": "When you have dying neurons (many neurons output 0).",
+        "GELU": "For transformers and state-of-art NLP models.",
+        "Sigmoid": "Binary classification output layer, LSTM gates.",
+        "Tanh": "When you need zero-centered output, LSTM/GRU gates.",
+        "Softmax": "Multi-class classification output layer ONLY.",
+        "Linear (none)": "Regression output layer (predict continuous values)."
+      },
+      "common_pitfalls": [
+        "Using sigmoid/tanh in deep networks: Causes vanishing gradients. Use ReLU.",
+        "Forgetting activation after linear layer: Network becomes purely linear!",
+        "Using ReLU at output for classification: Use sigmoid/softmax instead.",
+        "Dying ReLU problem: Too high learning rate kills neurons. Lower LR or use Leaky ReLU.",
+        "Not normalizing before sigmoid/softmax: Very large inputs → numerical instability."
+      ],
+      "interview_tips": [
+        "Explain why we need non-linearity (otherwise deep = shallow)",
+        "Know vanishing gradient problem with sigmoid/tanh",
+        "Explain ReLU advantages: simple, no saturation, sparse",
+        "When asked 'which activation?': Hidden=ReLU, Output=task dependent",
+        "Mention modern trend: GELU for transformers, ReLU still dominant"
+      ],
+      "related_topics": ["Neural Networks", "Backpropagation", "Vanishing Gradients", "Batch Normalization"],
+      "further_reading": [
+        "Deep Learning Book - Chapter 6.3 (Goodfellow et al.)",
+        "Activation Functions in Neural Networks (Andrew Ng)",
+        "GELU paper: Gaussian Error Linear Units"
+      ]
+    },
+    "Tokenization": {
+      "category": "NLP",
+      "difficulty": "Easy",
+      "importance": "Critical",
+      "prerequisites": ["Text Processing", "Python Basics"],
+      "layman_explanation": {
+        "title": "What is Tokenization in Simple Terms?",
+        "content": "Imagine reading a sentence - your brain automatically breaks it into meaningful units (words, punctuation). Tokenization does this for AI: it splits text into pieces (tokens) that the model can process. For 'Hello, world!' → ['Hello', ',', 'world', '!']. Modern LLMs use subword tokenization, breaking words into smaller chunks: 'unbelievable' → ['un', 'believ', 'able']. This lets models handle any word, even made-up ones, with a fixed vocabulary of ~50,000 subword pieces instead of millions of possible words."
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of Tokenization",
+        "content": "Tokenization is the process of converting raw text into discrete units (tokens) that can be mapped to numerical IDs for model input. Modern approaches use subword tokenization (BPE, WordPiece, SentencePiece) which balances vocabulary size with representation power. The algorithm learns a vocabulary from training data by iteratively merging frequent character/subword pairs. This handles rare words via composition, supports multiple languages, and keeps vocabulary manageable (~32k-50k tokens). Special tokens ([CLS], [SEP], [PAD]) are added for task-specific purposes. The same tokenizer must be used for training and inference.",
+        "key_concepts": [
+          "Vocabulary: Fixed set of tokens the model knows (e.g., 50,257 for GPT-2)",
+          "Token IDs: Integers representing tokens (e.g., 'hello' → 31373)",
+          "Subword units: Splitting words into smaller pieces (byte-pair encoding)",
+          "Special tokens: [PAD], [CLS], [SEP], [UNK], [MASK] for specific purposes",
+          "Out-of-vocabulary: Handling unknown words via subword decomposition"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "Byte-Pair Encoding (BPE) Algorithm",
+          "formula": "Iteratively merge most frequent adjacent token pairs until vocab size reached",
+          "explanation": "Start with characters, repeatedly merge common pairs like ('e', 'r') → 'er'",
+          "example": "'lower' → ['l', 'o', 'w', 'e', 'r'] → ['l', 'o', 'w', 'er'] → ['low', 'er']"
+        },
+        {
+          "name": "Token Sequence",
+          "formula": "text → [token_1, token_2, ..., token_n] → [id_1, id_2, ..., id_n]",
+          "explanation": "Text is converted to token strings, then mapped to integer IDs",
+          "note": "Maximum sequence length (context window) varies by model (e.g., 512, 2048, 128k)"
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "from transformers import AutoTokenizer\nimport tiktoken\n\n# ====== Using HuggingFace Tokenizers ======\nprint(\"=== HuggingFace Tokenizers ===\")\n\n# Load pretrained tokenizer\ntokenizer = AutoTokenizer.from_pretrained(\"bert-base-uncased\")\n\ntext = \"Hello, how are you doing today?\"\n\n# Tokenize text\ntokens = tokenizer.tokenize(text)\nprint(f\"Text: {text}\")\nprint(f\"Tokens: {tokens}\")\n\n# Convert to IDs\ntoken_ids = tokenizer.encode(text)\nprint(f\"Token IDs: {token_ids}\")\n\n# Decode back to text\ndecoded = tokenizer.decode(token_ids)\nprint(f\"Decoded: {decoded}\")\n\n# Full encoding (with attention masks, etc.)\nencoded = tokenizer(text, return_tensors=\"pt\")\nprint(f\"\\nFull encoding:\")\nprint(f\"  input_ids: {encoded['input_ids']}\")\nprint(f\"  attention_mask: {encoded['attention_mask']}\")\n\n# ====== Special Tokens ======\nprint(\"\\n=== Special Tokens ===\")\nprint(f\"CLS token: {tokenizer.cls_token} (ID: {tokenizer.cls_token_id})\")\nprint(f\"SEP token: {tokenizer.sep_token} (ID: {tokenizer.sep_token_id})\")\nprint(f\"PAD token: {tokenizer.pad_token} (ID: {tokenizer.pad_token_id})\")\nprint(f\"UNK token: {tokenizer.unk_token} (ID: {tokenizer.unk_token_id})\")\nprint(f\"Vocabulary size: {len(tokenizer)}\")\n\n# ====== Padding and Truncation ======\nprint(\"\\n=== Padding and Truncation ===\")\n\ntexts = [\n    \"Short text.\",\n    \"This is a much longer piece of text that might need to be truncated.\"\n]\n\n# Batch encoding with padding\nencoded_batch = tokenizer(\n    texts,\n    padding=True,          # Pad to longest in batch\n    truncation=True,       # Truncate if too long\n    max_length=10,         # Maximum sequence length\n    return_tensors=\"pt\"    # Return PyTorch tensors\n)\n\nprint(f\"Batch input_ids shape: {encoded_batch['input_ids'].shape}\")\nprint(f\"Input IDs:\\n{encoded_batch['input_ids']}\")\nprint(f\"Attention mask:\\n{encoded_batch['attention_mask']}\")\nprint(\"Note: Attention mask has 0s for padding tokens\")\n\n# ====== Different Tokenization Strategies ======\nprint(\"\\n=== Comparing Tokenizers ===\")\n\ntext = \"unbelievable\"\n\n# WordPiece (BERT)\nbert_tokenizer = AutoTokenizer.from_pretrained(\"bert-base-uncased\")\nbert_tokens = bert_tokenizer.tokenize(text)\nprint(f\"BERT (WordPiece): {text} → {bert_tokens}\")\n\n# BPE (GPT-2)\ngpt2_tokenizer = AutoTokenizer.from_pretrained(\"gpt2\")\ngpt2_tokens = gpt2_tokenizer.tokenize(text)\nprint(f\"GPT-2 (BPE): {text} → {gpt2_tokens}\")\n\n# SentencePiece (T5)\nt5_tokenizer = AutoTokenizer.from_pretrained(\"t5-small\")\nt5_tokens = t5_tokenizer.tokenize(text)\nprint(f\"T5 (SentencePiece): {text} → {t5_tokens}\")\n\n# ====== Handling Out-of-Vocabulary ======\nprint(\"\\n=== Out-of-Vocabulary Handling ===\")\n\nrare_word = \"supercalifragilisticexpialidocious\"\ntokens_rare = tokenizer.tokenize(rare_word)\nprint(f\"Rare word: {rare_word}\")\nprint(f\"Subword tokens: {tokens_rare}\")\nprint(f\"Token count: {len(tokens_rare)}\")\nprint(\"Subword tokenization handles ANY word via composition!\")\n\n# ====== Simple BPE Implementation ======\nprint(\"\\n=== Simple BPE Implementation ===\")\n\nfrom collections import Counter\n\ndef simple_bpe(text, num_merges=10):\n    \"\"\"Simplified BPE for demonstration\"\"\"\n    # Start with character-level tokens\n    tokens = [' '.join(word) + ' </w>' for word in text.split()]\n    \n    for _ in range(num_merges):\n        # Count all adjacent pairs\n        pairs = Counter()\n        for token in tokens:\n            symbols = token.split()\n            for i in range(len(symbols) - 1):\n                pairs[(symbols[i], symbols[i+1])] += 1\n        \n        if not pairs:\n            break\n        \n        # Merge most frequent pair\n        best_pair = max(pairs, key=pairs.get)\n        tokens = [t.replace(' '.join(best_pair), ''.join(best_pair)) for t in tokens]\n        print(f\"Merged: {best_pair} → {''.join(best_pair)}\")\n    \n    return tokens\n\ntext = \"low low low lower lowest\"\nprint(f\"\\nOriginal: {text}\")\nresult = simple_bpe(text, num_merges=5)\nprint(f\"Final tokens: {result}\")\n\n# ====== OpenAI tiktoken (GPT-4) ======\nprint(\"\\n=== OpenAI tiktoken ===\")\n\n# Fast BPE tokenizer for GPT models\nenc = tiktoken.get_encoding(\"cl100k_base\")  # GPT-4 encoding\ntext = \"Hello, world! How are you?\"\ntokens = enc.encode(text)\nprint(f\"Text: {text}\")\nprint(f\"Token IDs: {tokens}\")\nprint(f\"Token count: {len(tokens)}\")\nprint(f\"Decoded: {enc.decode(tokens)}\")\n\n# ====== Best Practices ======\nprint(\"\\n=== Tokenization Best Practices ===\")\nprint(\"1. ALWAYS use the same tokenizer for training and inference\")\nprint(\"2. Set max_length to prevent excessive memory usage\")\nprint(\"3. Use padding='max_length' for fixed-size batches (TPUs)\")\nprint(\"4. Enable truncation=True to handle long inputs gracefully\")\nprint(\"5. Check tokenizer.model_max_length for context window limit\")\nprint(\"6. Add special tokens when needed: add_special_tokens=True\")\n\n# ====== Common Issues ======\nprint(\"\\n=== Troubleshooting ===\")\nprint(\"Issue: Different token counts between tokenizers\")\nprint(\"  → Each model has its own tokenizer. Always use matching pair.\")\nprint(\"\\nIssue: Sequence too long error\")\nprint(\"  → Set max_length and truncation=True\")\nprint(\"\\nIssue: Unexpected tokens\")\nprint(\"  → Check if tokenizer is case-sensitive (BERT lowercases)\")\nprint(\"\\nIssue: Padding tokens affecting loss\")\nprint(\"  → Use attention_mask to ignore padding in loss calculation\")",
+        "explanation": "Complete tokenization guide: using HuggingFace tokenizers, special tokens, padding/truncation, different strategies (BPE, WordPiece), and practical tips. Essential for any NLP task."
+      },
+      "tokenization_methods": {
+        "Word-level": "Split by spaces. Huge vocabulary, can't handle rare words. Rarely used.",
+        "Character-level": "Individual characters. Small vocab, very long sequences. Limited use.",
+        "Subword (BPE)": "Byte-Pair Encoding. Used in GPT, RoBERTa. Learns merges from data.",
+        "WordPiece": "Similar to BPE. Used in BERT. Maximizes likelihood of training data.",
+        "SentencePiece": "Language-agnostic. Used in T5, XLM. Treats spaces as tokens.",
+        "Unigram": "Probabilistic subword segmentation. Used in some multilingual models."
+      },
+      "common_pitfalls": [
+        "Using wrong tokenizer: BERT tokenizer on GPT model → garbage output",
+        "Forgetting max_length: Long texts cause OOM errors",
+        "Not padding batches: Variable-length tensors cause errors",
+        "Ignoring special tokens: [CLS], [SEP] are critical for BERT-style models",
+        "Case sensitivity: BERT lowercases, GPT preserves case - know your tokenizer"
+      ],
+      "interview_tips": [
+        "Explain why subword tokenization beats word-level (handles rare words, smaller vocab)",
+        "Know BPE algorithm: iteratively merge frequent character pairs",
+        "Mention vocabulary size: typically 30k-50k for balance",
+        "Discuss special tokens purpose: [PAD] for batching, [CLS] for classification, etc.",
+        "Contrast tokenizers: BPE (GPT) vs WordPiece (BERT) vs SentencePiece (T5)"
+      ],
+      "related_topics": ["BERT", "GPT", "Word Embeddings", "Transformers", "Vocabulary"],
+      "further_reading": [
+        "Neural Machine Translation of Rare Words with Subword Units (BPE paper)",
+        "HuggingFace Tokenizers Documentation",
+        "SentencePiece: A simple and language independent approach"
+      ]
+    },
+    "BERT": {
+      "category": "NLP",
+      "difficulty": "Medium",
+      "importance": "Critical",
+      "prerequisites": ["Transformers", "Attention Mechanism", "Tokenization"],
+      "layman_explanation": {
+        "title": "What is BERT in Simple Terms?",
+        "content": "Imagine learning English by reading books with random words blanked out - you'd learn context and meaning deeply. BERT (Bidirectional Encoder Representations from Transformers) does exactly this: it's trained to predict masked words in sentences, learning language by seeing context from BOTH directions (left and right). Unlike GPT which only sees previous words, BERT sees the full sentence. This makes BERT excellent for understanding tasks like question answering, classification, and named entity recognition - any task where you need to deeply understand text, not just generate it."
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of BERT",
+        "content": "BERT is a transformer encoder pretrained on two tasks: (1) Masked Language Modeling (MLM) - 15% of tokens are masked, model predicts them using bidirectional context, (2) Next Sentence Prediction (NSP) - model predicts if sentence B follows sentence A. Pretraining uses massive unlabeled text (Wikipedia + BookCorpus). For downstream tasks, BERT is fine-tuned: add a task-specific head (e.g., classification layer) and train end-to-end. Key innovation: bidirectional attention (unlike GPT's causal/left-to-right) enables richer representations. BERT-base has 110M params (12 layers, 768 dim), BERT-large has 340M params (24 layers, 1024 dim).",
+        "key_concepts": [
+          "Masked Language Modeling: Predict masked tokens using full context (bidirectional)",
+          "Bidirectional attention: See entire sentence, not just previous tokens",
+          "Transfer learning: Pretrain on unlabeled data, fine-tune on labeled tasks",
+          "Special tokens: [CLS] for classification, [SEP] for separating segments",
+          "[CLS] embedding: Used as sentence representation for classification"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "Masked Language Modeling Loss",
+          "formula": "L_MLM = -Σ log P(x_masked | x_unmasked)",
+          "explanation": "Predict masked tokens using cross-entropy loss",
+          "note": "15% of tokens masked: 80% replaced with [MASK], 10% random, 10% unchanged"
+        },
+        {
+          "name": "Next Sentence Prediction Loss",
+          "formula": "L_NSP = -log P(IsNext | [CLS])",
+          "explanation": "Binary classification: does sentence B follow A?",
+          "note": "50% positive pairs (consecutive sentences), 50% negative (random pairs)"
+        },
+        {
+          "name": "Total Pretraining Loss",
+          "formula": "L = L_MLM + L_NSP",
+          "explanation": "Combined loss for pretraining",
+          "note": "RoBERTa drops NSP as it doesn't help much"
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "from transformers import BertTokenizer, BertModel, BertForSequenceClassification\nimport torch\nimport torch.nn as nn\n\n# ====== Loading Pretrained BERT ======\nprint(\"=== Loading Pretrained BERT ===\")\n\ntokenizer = BertTokenizer.from_pretrained('bert-base-uncased')\nmodel = BertModel.from_pretrained('bert-base-uncased')\n\nprint(f\"Model: {model.__class__.__name__}\")\nprint(f\"Parameters: {sum(p.numel() for p in model.parameters()):,}\")\nprint(f\"Vocabulary size: {len(tokenizer)}\")\n\n# ====== Basic Usage: Getting Embeddings ======\nprint(\"\\n=== Getting BERT Embeddings ===\")\n\ntext = \"BERT is a powerful language model.\"\n\n# Tokenize\ninputs = tokenizer(text, return_tensors=\"pt\")\nprint(f\"Input text: {text}\")\nprint(f\"Token IDs: {inputs['input_ids']}\")\nprint(f\"Tokens: {tokenizer.convert_ids_to_tokens(inputs['input_ids'][0])}\")\n\n# Forward pass\nwith torch.no_grad():\n    outputs = model(**inputs)\n\n# Extract representations\nlast_hidden_state = outputs.last_hidden_state  # (batch, seq_len, 768)\npooler_output = outputs.pooler_output          # (batch, 768) - [CLS] token\n\nprint(f\"\\nLast hidden state shape: {last_hidden_state.shape}\")\nprint(f\"Pooler output shape: {pooler_output.shape}\")\nprint(f\"Pooler output is [CLS] token representation for classification\")\n\n# ====== Understanding Special Tokens ======\nprint(\"\\n=== Special Tokens ===\")\n\nsentence_a = \"What is BERT?\"\nsentence_b = \"BERT is a transformer model.\"\n\n# Encode pair of sentences\ninputs = tokenizer(\n    sentence_a, \n    sentence_b,\n    return_tensors=\"pt\",\n    add_special_tokens=True\n)\n\ntokens = tokenizer.convert_ids_to_tokens(inputs['input_ids'][0])\nprint(f\"Sentence A: {sentence_a}\")\nprint(f\"Sentence B: {sentence_b}\")\nprint(f\"Tokenized: {tokens}\")\nprint(\"Format: [CLS] sentence_a [SEP] sentence_b [SEP]\")\n\n# ====== Fine-tuning for Classification ======\nprint(\"\\n=== Fine-tuning for Text Classification ===\")\n\n# Load BERT with classification head\nmodel_clf = BertForSequenceClassification.from_pretrained(\n    'bert-base-uncased',\n    num_labels=2  # Binary classification\n)\n\nprint(f\"Classification model: {model_clf.__class__.__name__}\")\nprint(\"Architecture: BERT + Linear classifier on [CLS] token\")\n\n# Dummy training data\ntexts = [\n    \"I love this movie!\",\n    \"This film is terrible.\",\n    \"Amazing performance!\",\n    \"Waste of time.\"\n]\nlabels = torch.tensor([1, 0, 1, 0])  # 1=positive, 0=negative\n\n# Tokenize batch\ninputs = tokenizer(\n    texts,\n    padding=True,\n    truncation=True,\n    return_tensors=\"pt\"\n)\n\n# Training step\nmodel_clf.train()\noptimizer = torch.optim.AdamW(model_clf.parameters(), lr=2e-5)\n\nfor epoch in range(3):\n    optimizer.zero_grad()\n    \n    # Forward pass\n    outputs = model_clf(**inputs, labels=labels)\n    loss = outputs.loss\n    logits = outputs.logits\n    \n    # Backward pass\n    loss.backward()\n    optimizer.step()\n    \n    # Compute accuracy\n    preds = torch.argmax(logits, dim=1)\n    acc = (preds == labels).float().mean()\n    \n    print(f\"Epoch {epoch}: Loss={loss.item():.4f}, Acc={acc.item():.2%}\")\n\n# ====== Inference ======\nprint(\"\\n=== Inference ===\")\n\nmodel_clf.eval()\ntest_text = \"This is absolutely wonderful!\"\ntest_inputs = tokenizer(test_text, return_tensors=\"pt\")\n\nwith torch.no_grad():\n    outputs = model_clf(**test_inputs)\n    logits = outputs.logits\n    probs = torch.softmax(logits, dim=1)\n    pred = torch.argmax(probs, dim=1)\n\nprint(f\"Text: {test_text}\")\nprint(f\"Prediction: {'Positive' if pred == 1 else 'Negative'}\")\nprint(f\"Confidence: {probs[0][pred].item():.2%}\")\n\n# ====== Different BERT Variants ======\nprint(\"\\n=== BERT Variants ===\")\n\nprint(\"\"\"\nBERT-base: 12 layers, 768 dim, 110M params\nBERT-large: 24 layers, 1024 dim, 340M params\nRoBERTa: Improved BERT (no NSP, more data, dynamic masking)\nDistilBERT: 6 layers, 66M params, 97% BERT performance, 2x faster\nALBERT: Parameter sharing, factorized embeddings, fewer params\nElectra: Replaced token detection instead of masking, more efficient\n\"\"\")\n\n# ====== Task-specific Fine-tuning ======\nprint(\"\\n=== BERT for Different Tasks ===\")\n\nfrom transformers import (\n    BertForSequenceClassification,  # Text classification\n    BertForTokenClassification,     # NER, POS tagging\n    BertForQuestionAnswering,       # SQuAD-style QA\n    BertForMaskedLM,                # MLM (pretraining task)\n)\n\nprint(\"BertForSequenceClassification: Sentiment, topic classification\")\nprint(\"BertForTokenClassification: NER, POS tagging (per-token labels)\")\nprint(\"BertForQuestionAnswering: Extractive QA (predict span)\")\nprint(\"BertForMaskedLM: Fill-in-the-blank, continue pretraining\")\n\n# ====== Custom BERT Head ======\nprint(\"\\n=== Custom Task Head ===\")\n\nclass BERTForCustomTask(nn.Module):\n    \"\"\"BERT with custom head for specific task\"\"\"\n    def __init__(self, num_classes):\n        super().__init__()\n        self.bert = BertModel.from_pretrained('bert-base-uncased')\n        \n        # Custom head: [CLS] → Dense → Dropout → Output\n        self.classifier = nn.Sequential(\n            nn.Linear(768, 256),\n            nn.ReLU(),\n            nn.Dropout(0.1),\n            nn.Linear(256, num_classes)\n        )\n    \n    def forward(self, input_ids, attention_mask=None):\n        # Get BERT embeddings\n        outputs = self.bert(\n            input_ids=input_ids,\n            attention_mask=attention_mask\n        )\n        \n        # Use [CLS] token (first token)\n        cls_output = outputs.pooler_output  # (batch, 768)\n        \n        # Apply custom head\n        logits = self.classifier(cls_output)\n        return logits\n\ncustom_model = BERTForCustomTask(num_classes=3)\nprint(f\"Custom BERT model with 3-way classification head\")\nprint(f\"Total params: {sum(p.numel() for p in custom_model.parameters()):,}\")\n\n# ====== Best Practices ======\nprint(\"\\n=== BERT Fine-tuning Best Practices ===\")\nprint(\"1. Learning rate: 2e-5 to 5e-5 (smaller than typical)\")\nprint(\"2. Batch size: 16 or 32 (memory permitting)\")\nprint(\"3. Epochs: 2-4 (BERT fine-tunes quickly)\")\nprint(\"4. Warmup: Linear warmup for first 10% of steps\")\nprint(\"5. Freeze early layers: For small datasets, freeze first 6-9 layers\")\nprint(\"6. Gradient clipping: max_grad_norm=1.0 for stability\")\nprint(\"7. Use [CLS] token: For sentence-level tasks\")\n\nprint(\"\\n=== Common Issues ===\")\nprint(\"Overfitting on small data: Use DistilBERT or freeze layers\")\nprint(\"OOM errors: Reduce batch size or use gradient accumulation\")\nprint(\"Slow training: Use DistilBERT or mixed precision (fp16)\")\nprint(\"Poor performance: Check learning rate, try RoBERTa instead\")",
+        "explanation": "Complete BERT guide: loading pretrained models, getting embeddings, fine-tuning for classification, custom heads, and best practices. BERT is the foundation for most NLP understanding tasks."
+      },
+      "bert_variants": {
+        "RoBERTa": "Optimized BERT: no NSP, larger batches, more data. Often better than BERT.",
+        "DistilBERT": "6 layers, 40% smaller, 60% faster, 97% performance. Great for production.",
+        "ALBERT": "Parameter sharing across layers. Fewer params, similar performance.",
+        "ELECTRA": "Replaced token detection. More sample-efficient than MLM.",
+        "DeBERTa": "Disentangled attention. State-of-art on many benchmarks."
+      },
+      "common_pitfalls": [
+        "Too high learning rate: Use 2e-5, not 1e-3 like training from scratch",
+        "Training too long: BERT fine-tunes in 2-4 epochs, more = overfitting",
+        "Ignoring [CLS] token: For classification, use pooler_output or [CLS] embedding",
+        "Not using attention mask: Padding tokens will affect results without mask",
+        "Wrong tokenizer: Must use BertTokenizer with BERT model"
+      ],
+      "interview_tips": [
+        "Explain bidirectional vs unidirectional: BERT sees full context, GPT only left",
+        "Know pretraining tasks: MLM (masked prediction) + NSP (sentence pairs)",
+        "Discuss [CLS] token purpose: Sentence representation for classification",
+        "Mention fine-tuning efficiency: Only 2-4 epochs needed",
+        "Compare to GPT: BERT for understanding, GPT for generation"
+      ],
+      "related_topics": ["Transformers", "Transfer Learning", "Masked Language Modeling", "RoBERTa", "GPT"],
+      "further_reading": [
+        "BERT: Pre-training of Deep Bidirectional Transformers (Devlin et al., 2018)",
+        "RoBERTa: A Robustly Optimized BERT Pretraining Approach",
+        "The Illustrated BERT (Jay Alammar)"
+      ]
+    },
+    "Batch Normalization": {
+      "category": "Deep Learning",
+      "difficulty": "Medium",
+      "importance": "Very High",
+      "prerequisites": ["Neural Networks", "Backpropagation", "Statistics"],
+      "layman_explanation": {
+        "title": "What is Batch Normalization in Simple Terms?",
+        "content": "Imagine teaching a class where students learn at wildly different paces - some racing ahead, others falling behind. Batch Normalization is like regularly bringing everyone to the same baseline before each lesson. For neural networks, it normalizes (centers and scales) the inputs to each layer during training, so no layer gets overwhelmingly large or tiny values. This makes training much faster (can use higher learning rates), more stable (less sensitive to initialization), and often improves accuracy. It's like giving each layer a 'clean slate' to work with."
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of Batch Normalization",
+        "content": "Batch Normalization normalizes layer inputs across the mini-batch dimension. For each feature, it computes batch mean μ and variance σ², then normalizes: x_norm = (x - μ) / √(σ² + ε). To preserve representational power, it adds learnable scale γ and shift β parameters: y = γ×x_norm + β. During training, batch statistics are used; during inference, running averages accumulated during training are used. Benefits: (1) Reduces internal covariate shift, (2) Acts as regularization (slight noise from batch statistics), (3) Allows higher learning rates, (4) Less sensitive to weight initialization.",
+        "key_concepts": [
+          "Normalization: Center (mean=0) and scale (variance=1) across batch",
+          "Learnable parameters: γ (scale) and β (shift) per feature",
+          "Running statistics: Exponential moving averages of mean/var for inference",
+          "Internal covariate shift: Distribution of layer inputs changes during training",
+          "Training vs inference mode: Batch stats vs running stats"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "Batch Statistics",
+          "formula": "μ_B = (1/m)Σx_i,  σ²_B = (1/m)Σ(x_i - μ_B)²",
+          "explanation": "Compute mean and variance across mini-batch",
+          "variables": {
+            "m": "Batch size",
+            "x_i": "Input activations in the batch"
+          }
+        },
+        {
+          "name": "Normalization",
+          "formula": "x̂_i = (x_i - μ_B) / √(σ²_B + ε)",
+          "explanation": "Normalize to mean=0, variance=1",
+          "variables": {
+            "ε": "Small constant for numerical stability (e.g., 1e-5)"
+          }
+        },
+        {
+          "name": "Scale and Shift",
+          "formula": "y_i = γ × x̂_i + β",
+          "explanation": "Apply learnable transformation to preserve network capacity",
+          "variables": {
+            "γ": "Learnable scale parameter (initialized to 1)",
+            "β": "Learnable shift parameter (initialized to 0)"
+          }
+        },
+        {
+          "name": "Running Statistics (Inference)",
+          "formula": "μ_running = momentum × μ_running + (1-momentum) × μ_B",
+          "explanation": "Exponential moving average during training, used at inference",
+          "note": "Typical momentum = 0.9 or 0.99"
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "import torch\nimport torch.nn as nn\nimport numpy as np\n\n# ====== BatchNorm from Scratch ======\nprint(\"=== Batch Normalization Implementation ===\")\n\nclass BatchNorm1d:\n    \"\"\"Simple 1D Batch Normalization\"\"\"\n    def __init__(self, num_features, eps=1e-5, momentum=0.1):\n        self.eps = eps\n        self.momentum = momentum\n        \n        # Learnable parameters\n        self.gamma = np.ones(num_features)  # Scale\n        self.beta = np.zeros(num_features)  # Shift\n        \n        # Running statistics (for inference)\n        self.running_mean = np.zeros(num_features)\n        self.running_var = np.ones(num_features)\n        \n    def forward(self, x, training=True):\n        \"\"\"\n        x: (batch_size, num_features)\n        \"\"\"\n        if training:\n            # Compute batch statistics\n            batch_mean = x.mean(axis=0)\n            batch_var = x.var(axis=0)\n            \n            # Normalize\n            x_norm = (x - batch_mean) / np.sqrt(batch_var + self.eps)\n            \n            # Update running statistics\n            self.running_mean = (1 - self.momentum) * self.running_mean + \\\n                                self.momentum * batch_mean\n            self.running_var = (1 - self.momentum) * self.running_var + \\\n                               self.momentum * batch_var\n        else:\n            # Use running statistics for inference\n            x_norm = (x - self.running_mean) / np.sqrt(self.running_var + self.eps)\n        \n        # Scale and shift\n        out = self.gamma * x_norm + self.beta\n        return out\n\n# Test\nbn = BatchNorm1d(num_features=3)\nx = np.random.randn(10, 3)  # batch_size=10, features=3\n\nprint(f\"Input mean: {x.mean(axis=0)}\")\nprint(f\"Input std: {x.std(axis=0)}\")\n\ny = bn.forward(x, training=True)\nprint(f\"\\nOutput mean (training): {y.mean(axis=0)}\")\nprint(f\"Output std (training): {y.std(axis=0)}\")\nprint(\"Normalized to ~mean=0, ~std=1\")\n\n# ====== Using PyTorch BatchNorm ======\nprint(\"\\n=== PyTorch Batch Normalization ===\")\n\n# 1D BatchNorm (for fully connected layers)\nbn1d = nn.BatchNorm1d(num_features=10)\n\n# 2D BatchNorm (for conv layers: batch, channels, height, width)\nbn2d = nn.BatchNorm2d(num_features=64)  # 64 channels\n\nprint(f\"BatchNorm1d parameters: {sum(p.numel() for p in bn1d.parameters())}\")\nprint(f\"  - gamma (weight): {bn1d.weight.shape}\")\nprint(f\"  - beta (bias): {bn1d.bias.shape}\")\nprint(f\"  - running_mean: {bn1d.running_mean.shape}\")\nprint(f\"  - running_var: {bn1d.running_var.shape}\")\n\n# ====== Training vs Inference Mode ======\nprint(\"\\n=== Training vs Inference ===\")\n\nbn = nn.BatchNorm1d(10)\nx = torch.randn(32, 10)  # batch_size=32, features=10\n\n# Training mode\nbn.train()\ny_train = bn(x)\nprint(f\"Training mode:\")\nprint(f\"  Uses batch statistics\")\nprint(f\"  Output mean: {y_train.mean(dim=0).abs().mean():.4f} (close to 0)\")\nprint(f\"  Output std: {y_train.std(dim=0).mean():.4f} (close to 1)\")\n\n# Inference mode\nbn.eval()\ny_test = bn(x)\nprint(f\"\\nInference mode:\")\nprint(f\"  Uses running statistics\")\nprint(f\"  Output mean: {y_test.mean(dim=0).abs().mean():.4f}\")\nprint(f\"  Output std: {y_test.std(dim=0).mean():.4f}\")\n\n# ====== In a Neural Network ======\nprint(\"\\n=== BatchNorm in Neural Networks ===\")\n\n# Typical placement: Linear → BatchNorm → Activation\nmodel = nn.Sequential(\n    nn.Linear(100, 50),\n    nn.BatchNorm1d(50),  # After linear, before activation\n    nn.ReLU(),\n    \n    nn.Linear(50, 20),\n    nn.BatchNorm1d(20),\n    nn.ReLU(),\n    \n    nn.Linear(20, 10)\n)\n\nprint(\"Model with BatchNorm:\")\nprint(model)\n\n# Training\nmodel.train()\nx = torch.randn(64, 100)\ny = model(x)\nprint(f\"\\nOutput shape: {y.shape}\")\n\n# IMPORTANT: Always set eval() mode for inference\nmodel.eval()\nwith torch.no_grad():\n    y_test = model(x)\nprint(f\"Inference output shape: {y_test.shape}\")\n\n# ====== Comparing with/without BatchNorm ======\nprint(\"\\n=== Impact of BatchNorm ===\")\n\n# Without BatchNorm\nmodel_no_bn = nn.Sequential(\n    nn.Linear(100, 50), nn.ReLU(),\n    nn.Linear(50, 20), nn.ReLU(),\n    nn.Linear(20, 10)\n)\n\n# With BatchNorm\nmodel_bn = nn.Sequential(\n    nn.Linear(100, 50), nn.BatchNorm1d(50), nn.ReLU(),\n    nn.Linear(50, 20), nn.BatchNorm1d(20), nn.ReLU(),\n    nn.Linear(20, 10)\n)\n\n# Dummy training\noptimizer_no_bn = torch.optim.SGD(model_no_bn.parameters(), lr=0.1)\noptimizer_bn = torch.optim.SGD(model_bn.parameters(), lr=0.1)\n\nloss_history_no_bn = []\nloss_history_bn = []\n\nfor epoch in range(10):\n    x = torch.randn(32, 100)\n    y_true = torch.randint(0, 10, (32,))\n    \n    # Without BN\n    logits = model_no_bn(x)\n    loss = nn.CrossEntropyLoss()(logits, y_true)\n    optimizer_no_bn.zero_grad()\n    loss.backward()\n    optimizer_no_bn.step()\n    loss_history_no_bn.append(loss.item())\n    \n    # With BN\n    model_bn.train()\n    logits = model_bn(x)\n    loss = nn.CrossEntropyLoss()(logits, y_true)\n    optimizer_bn.zero_grad()\n    loss.backward()\n    optimizer_bn.step()\n    loss_history_bn.append(loss.item())\n\nprint(f\"Final loss without BN: {loss_history_no_bn[-1]:.4f}\")\nprint(f\"Final loss with BN: {loss_history_bn[-1]:.4f}\")\nprint(\"BatchNorm typically enables faster, more stable training\")\n\n# ====== BatchNorm for CNNs ======\nprint(\"\\n=== BatchNorm for Convolutional Networks ===\")\n\ncnn = nn.Sequential(\n    # Conv → BatchNorm2d → ReLU\n    nn.Conv2d(3, 64, kernel_size=3, padding=1),\n    nn.BatchNorm2d(64),  # Normalize across spatial dimensions\n    nn.ReLU(),\n    \n    nn.Conv2d(64, 128, kernel_size=3, padding=1),\n    nn.BatchNorm2d(128),\n    nn.ReLU(),\n    \n    nn.AdaptiveAvgPool2d(1),\n    nn.Flatten(),\n    nn.Linear(128, 10)\n)\n\nprint(\"CNN with BatchNorm2d:\")\nx = torch.randn(8, 3, 32, 32)  # batch=8, channels=3, 32x32 image\ny = cnn(x)\nprint(f\"Input: {x.shape} → Output: {y.shape}\")\n\n# ====== Best Practices ======\nprint(\"\\n=== BatchNorm Best Practices ===\")\nprint(\"1. Placement: Linear/Conv → BatchNorm → Activation\")\nprint(\"2. Always call model.train() / model.eval() appropriately\")\nprint(\"3. Use larger batch sizes (>=16) for stable batch statistics\")\nprint(\"4. For very small batches: use GroupNorm or LayerNorm instead\")\nprint(\"5. Don't use with Dropout in most cases (both regularize)\")\n\nprint(\"\\n=== Common Mistakes ===\")\nprint(\"❌ Forgetting model.eval() during inference → uses wrong statistics\")\nprint(\"❌ Batch size = 1 → batch statistics undefined\")\nprint(\"❌ Placing BN after activation → less effective\")\nprint(\"❌ Using BN in RNNs → use LayerNorm instead\")",
+        "explanation": "Complete BatchNorm guide: implementation from scratch, PyTorch usage, training vs inference modes, placement in networks, and comparison with/without BN. Essential for training deep networks effectively."
+      },
+      "placement_guidelines": {
+        "Standard": "Conv/Linear → BatchNorm → Activation (ReLU, etc.)",
+        "ResNet style": "Conv → BatchNorm → ReLU (original paper order)",
+        "Before activation": "Most common and recommended",
+        "After activation": "Less common, generally less effective"
+      },
+      "alternatives": {
+        "LayerNorm": "Normalize across features (not batch). Used in transformers, RNNs.",
+        "GroupNorm": "Split channels into groups, normalize within groups. Good for small batches.",
+        "InstanceNorm": "Normalize each sample independently. Used in style transfer.",
+        "WeightNorm": "Normalize weight matrices instead of activations."
+      },
+      "common_pitfalls": [
+        "Forgetting model.eval(): Uses batch stats during inference → inconsistent results",
+        "Small batch sizes: Batch stats unstable with batch_size < 16. Use GroupNorm instead.",
+        "Using with Dropout: Both regularize - usually pick one (BN is often enough)",
+        "In RNNs: BatchNorm doesn't work well. Use LayerNorm instead.",
+        "Placing after activation: Less effective than before activation"
+      ],
+      "interview_tips": [
+        "Explain normalization: center to mean=0, scale to variance=1",
+        "Know learnable params: γ (scale) and β (shift) preserve capacity",
+        "Training vs inference: batch stats vs running stats",
+        "Benefits: faster training, higher LR, less sensitive to init",
+        "When not to use: RNNs (use LayerNorm), very small batches (use GroupNorm)"
+      ],
+      "related_topics": ["LayerNorm", "GroupNorm", "Dropout", "Regularization", "Internal Covariate Shift"],
+      "further_reading": [
+        "Batch Normalization: Accelerating Deep Network Training (Ioffe & Szegedy, 2015)",
+        "How Does Batch Normalization Help Optimization? (Santurkar et al., 2018)",
+        "Group Normalization (Wu & He, 2018)"
+      ]
+    },
+    "Dropout": {
+      "category": "Deep Learning",
+      "difficulty": "Easy",
+      "importance": "Very High",
+      "prerequisites": ["Neural Networks", "Overfitting", "Regularization"],
+      "layman_explanation": {
+        "title": "What is Dropout in Simple Terms?",
+        "content": "Imagine a study group where some members are randomly absent each session - the group learns to not rely on any single person, becoming more robust. Dropout does this for neural networks: during training, it randomly 'drops out' (sets to zero) a fraction of neurons each iteration. This prevents the network from over-relying on specific neurons, forcing it to learn redundant representations. It's like training an ensemble of smaller networks. At test time, all neurons are active but scaled appropriately. This simple technique dramatically reduces overfitting."
+      },
+      "technical_explanation": {
+        "title": "Technical Understanding of Dropout",
+        "content": "Dropout is a regularization technique that randomly sets a fraction p of neuron activations to zero during each training iteration. Each neuron is retained with probability (1-p), forming a 'thinned' network. This prevents co-adaptation where neurons rely too heavily on specific other neurons. Mathematically, during training: y = mask ⊙ x where mask ~ Bernoulli(1-p), scaled by 1/(1-p) to maintain expected values. At inference, all neurons are active (no dropout) - the scaling during training ensures correct expected values. Dropout can be seen as training an ensemble of 2^n subnetworks that share weights.",
+        "key_concepts": [
+          "Drop probability p: Fraction of neurons to drop (typical: 0.5 for hidden, 0.1-0.2 for input)",
+          "Bernoulli mask: Random binary mask applied to activations",
+          "Inverted dropout: Scale during training by 1/(1-p) for no change at test time",
+          "Ensemble effect: Implicitly trains exponentially many thinned networks",
+          "Training vs inference: Active during training, disabled during inference"
+        ]
+      },
+      "formulas": [
+        {
+          "name": "Dropout (Training)",
+          "formula": "mask ~ Bernoulli(1-p),  y = (mask ⊙ x) / (1-p)",
+          "explanation": "Randomly zero out neurons, scale remaining by 1/(1-p)",
+          "variables": {
+            "p": "Drop probability (e.g., 0.5 means drop 50% of neurons)",
+            "⊙": "Element-wise multiplication",
+            "1-p": "Keep probability"
+          }
+        },
+        {
+          "name": "Dropout (Inference)",
+          "formula": "y = x",
+          "explanation": "No dropout - all neurons active (scaling already handled during training)",
+          "note": "Inverted dropout ensures no changes needed at test time"
+        },
+        {
+          "name": "Expected Output",
+          "formula": "E[y_train] = E[y_test] due to 1/(1-p) scaling",
+          "explanation": "Scaling maintains expected activation values between train and test",
+          "note": "This is why inverted dropout is preferred"
+        }
+      ],
+      "code_implementation": {
+        "language": "python",
+        "simple_example": "import torch\nimport torch.nn as nn\nimport torch.nn.functional as F\nimport numpy as np\n\n# ====== Dropout from Scratch ======\nprint(\"=== Dropout Implementation ===\")\n\ndef dropout(x, p=0.5, training=True):\n    \"\"\"Inverted dropout implementation\"\"\"\n    if not training or p == 0:\n        return x\n    \n    # Create binary mask\n    keep_prob = 1 - p\n    mask = (np.random.rand(*x.shape) < keep_prob).astype(float)\n    \n    # Apply mask and scale\n    return (x * mask) / keep_prob\n\n# Test dropout\nx = np.ones((5, 10))  # 5 samples, 10 features\nprint(f\"Original:\\n{x[0]}\\n\")\n\ny_train = dropout(x, p=0.5, training=True)\nprint(f\"With dropout (p=0.5):\\n{y_train[0]}\")\nprint(f\"Note: ~50% zeros, others scaled by 2\\n\")\n\ny_test = dropout(x, p=0.5, training=False)\nprint(f\"Inference (no dropout):\\n{y_test[0]}\")\n\n# ====== PyTorch Dropout ======\nprint(\"\\n=== PyTorch Dropout ===\")\n\ndropout_layer = nn.Dropout(p=0.5)\n\nx = torch.ones(5, 10)\n\n# Training mode\ndropout_layer.train()\ny_train = dropout_layer(x)\nprint(f\"Training mode (p=0.5):\")\nprint(f\"Input:  {x[0]}\")\nprint(f\"Output: {y_train[0]}\")\nprint(f\"Zeros: {(y_train[0] == 0).sum().item()}/10\\n\")\n\n# Inference mode\ndropout_layer.eval()\ny_test = dropout_layer(x)\nprint(f\"Inference mode:\")\nprint(f\"Output: {y_test[0]}\")\nprint(f\"All values preserved (no dropout)\")\n\n# ====== Dropout in Neural Network ======\nprint(\"\\n=== Dropout in Networks ===\")\n\nmodel = nn.Sequential(\n    nn.Linear(100, 50),\n    nn.ReLU(),\n    nn.Dropout(0.5),      # 50% dropout\n    \n    nn.Linear(50, 20),\n    nn.ReLU(),\n    nn.Dropout(0.3),      # 30% dropout\n    \n    nn.Linear(20, 10)\n    # No dropout on output layer\n)\n\nprint(\"Model with dropout:\")\nprint(model)\n\n# Training\nmodel.train()\nx = torch.randn(32, 100)\ny = model(x)\nprint(f\"\\nTraining output shape: {y.shape}\")\n\n# Inference - MUST set eval mode\nmodel.eval()\nwith torch.no_grad():\n    y_test = model(x)\nprint(f\"Inference output shape: {y_test.shape}\")\n\n# ====== Demonstration: Dropout Reduces Overfitting ======\nprint(\"\\n=== Dropout Effect on Overfitting ===\")\n\n# Small dataset (prone to overfitting)\nX_train = torch.randn(100, 20)\ny_train = torch.randint(0, 2, (100,))\nX_test = torch.randn(50, 20)\ny_test = torch.randint(0, 2, (50,))\n\n# Model without dropout\nmodel_no_dropout = nn.Sequential(\n    nn.Linear(20, 100), nn.ReLU(),\n    nn.Linear(100, 100), nn.ReLU(),\n    nn.Linear(100, 2)\n)\n\n# Model with dropout\nmodel_dropout = nn.Sequential(\n    nn.Linear(20, 100), nn.ReLU(), nn.Dropout(0.5),\n    nn.Linear(100, 100), nn.ReLU(), nn.Dropout(0.5),\n    nn.Linear(100, 2)\n)\n\n# Train both\nfor name, model in [(\"No Dropout\", model_no_dropout), (\"With Dropout\", model_dropout)]:\n    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)\n    model.train()\n    \n    for epoch in range(50):\n        optimizer.zero_grad()\n        logits = model(X_train)\n        loss = F.cross_entropy(logits, y_train)\n        loss.backward()\n        optimizer.step()\n    \n    # Evaluate\n    model.eval()\n    with torch.no_grad():\n        train_acc = (model(X_train).argmax(1) == y_train).float().mean()\n        test_acc = (model(X_test).argmax(1) == y_test).float().mean()\n    \n    print(f\"{name}:\")\n    print(f\"  Train accuracy: {train_acc:.2%}\")\n    print(f\"  Test accuracy: {test_acc:.2%}\")\n    print(f\"  Overfit gap: {(train_acc - test_acc):.2%}\\n\")\n\n# ====== Different Dropout Types ======\nprint(\"=== Dropout Variants ===\")\n\n# Standard dropout\ndropout = nn.Dropout(p=0.5)\n\n# Dropout for 2D conv (drops entire feature maps)\ndropout2d = nn.Dropout2d(p=0.5)\nx_conv = torch.randn(4, 64, 28, 28)  # batch, channels, H, W\nout = dropout2d(x_conv)\nprint(f\"Dropout2D: Drops entire {out.shape[2:]} feature maps\")\n\n# Alpha dropout (for SELU activation)\nalpha_dropout = nn.AlphaDropout(p=0.5)\nprint(\"AlphaDropout: Maintains self-normalizing property of SELU\")\n\n# ====== Where to Place Dropout ======\nprint(\"\\n=== Dropout Placement ===\")\n\nprint(\"\"\"\nGood placements:\n  ✓ After activation: Linear → ReLU → Dropout\n  ✓ Before final layer: ... → Dropout → Output\n  ✓ Input layer: Dropout(0.1-0.2) on inputs\n\nAvoid:\n  ✗ On output layer (classification logits)\n  ✗ With BatchNorm (both regularize - usually pick one)\n  ✗ Very high p (>0.8) - drops too much information\n\"\"\")\n\n# ====== Dropout Probabilities ======\nprint(\"\\n=== Recommended Dropout Rates ===\")\nprint(\"Input layer: p = 0.1 to 0.2\")\nprint(\"Hidden layers: p = 0.5 (classic choice)\")\nprint(\"Large networks: p = 0.3 to 0.5\")\nprint(\"Small networks: p = 0.2 to 0.3\")\nprint(\"CNNs: p = 0.25 to 0.5 (after pooling/FC layers)\")\nprint(\"RNNs: Use dropout between stacked layers, not timesteps\")\n\n# ====== Monte Carlo Dropout (Uncertainty) ======\nprint(\"\\n=== MC Dropout for Uncertainty ===\")\n\ndef mc_dropout_predict(model, x, num_samples=100):\n    \"\"\"Get prediction uncertainty using dropout at test time\"\"\"\n    model.train()  # Enable dropout\n    predictions = []\n    \n    with torch.no_grad():\n        for _ in range(num_samples):\n            pred = F.softmax(model(x), dim=1)\n            predictions.append(pred)\n    \n    predictions = torch.stack(predictions)\n    mean_pred = predictions.mean(dim=0)\n    uncertainty = predictions.std(dim=0)\n    \n    return mean_pred, uncertainty\n\nmodel = nn.Sequential(\n    nn.Linear(10, 50), nn.ReLU(), nn.Dropout(0.5),\n    nn.Linear(50, 3)\n)\n\nx = torch.randn(1, 10)\nmean, std = mc_dropout_predict(model, x, num_samples=50)\nprint(f\"Prediction: {mean}\")\nprint(f\"Uncertainty: {std}\")\nprint(\"High uncertainty = model unsure\")\n\n# ====== Best Practices ======\nprint(\"\\n=== Dropout Best Practices ===\")\nprint(\"1. Always call model.train() and model.eval() appropriately\")\nprint(\"2. Start with p=0.5 for hidden layers, tune if needed\")\nprint(\"3. Use lower p for input layers (0.1-0.2)\")\nprint(\"4. Don't use with BatchNorm usually (both regularize)\")\nprint(\"5. For CNNs: Dropout after pooling or FC layers\")\nprint(\"6. Increase dropout if overfitting, decrease if underfitting\")\n\nprint(\"\\n=== Common Mistakes ===\")\nprint(\"❌ Forgetting model.eval() → dropout active during inference\")\nprint(\"❌ Using dropout on output layer\")\nprint(\"❌ Too high p (>0.7) → destroys too much information\")\nprint(\"❌ Using standard dropout in CNNs → use Dropout2d instead\")",
+        "explanation": "Complete Dropout guide: implementation from scratch, PyTorch usage, placement strategies, different variants, MC dropout for uncertainty, and best practices. Essential regularization technique for preventing overfitting."
+      },
+      "dropout_variants": {
+        "Standard Dropout": "Randomly drop neurons. For fully connected layers.",
+        "Dropout2d": "Drop entire feature maps in CNNs. Better for spatial data.",
+        "Dropout3d": "For 3D conv layers (video, volumetric data).",
+        "AlphaDropout": "For SELU activation. Maintains self-normalizing property.",
+        "DropConnect": "Drop weights instead of activations.",
+        "DropBlock": "Drop contiguous regions in CNNs (structured dropout)."
+      },
+      "common_pitfalls": [
+        "Forgetting eval mode: Dropout remains active during inference → inconsistent results",
+        "Too high dropout rate: p > 0.7 drops too much info, hurts performance",
+        "Wrong dropout type: Use Dropout2d for conv layers, not standard Dropout",
+        "Using with BatchNorm: Both regularize - often redundant, can conflict",
+        "On output layer: Never use dropout on classification logits"
+      ],
+      "interview_tips": [
+        "Explain intuition: prevents co-adaptation, forces redundancy",
+        "Training vs test: active during training, disabled at inference",
+        "Inverted dropout: scale by 1/(1-p) during training for no test-time changes",
+        "Typical rates: p=0.5 for hidden, 0.1-0.2 for input",
+        "Ensemble interpretation: training exponentially many thinned networks"
+      ],
+      "related_topics": ["Regularization", "Overfitting", "Batch Normalization", "Ensemble Methods"],
+      "further_reading": [
+        "Dropout: A Simple Way to Prevent Neural Networks from Overfitting (Srivastava et al., 2014)",
+        "Dropout as a Bayesian Approximation (Gal & Ghahramani, 2016)",
+        "Understanding Dropout (original Hinton paper)"
+      ]
+    }
+  }
+}

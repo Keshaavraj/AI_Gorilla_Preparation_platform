@@ -96,6 +96,18 @@ with st.sidebar:
     st.title("🎯 TestGorilla Prep")
     st.markdown("---")
 
+    # Quick links to learning resources
+    st.markdown("### 🎓 Learning Resources")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("📚 Learn Topics", use_container_width=True):
+            st.switch_page("pages/1_📚_Topic_Resources.py")
+    with col2:
+        if st.button("📖 Must-Know", use_container_width=True):
+            st.switch_page("pages/1_📚_Topic_Resources.py")
+
+    st.markdown("---")
+
     # Category selection
     st.subheader("Select Category")
     categories = db.get_all_categories()
@@ -387,6 +399,16 @@ else:
 
             # Time estimate
             st.caption(f"⏱️ Estimated time: ~{question['time_estimate']} seconds")
+
+            # Link to learn more
+            st.markdown("---")
+            st.markdown("### 📚 Want to Learn This Topic in Depth?")
+            col1, col2 = st.columns([2, 1])
+            with col1:
+                st.markdown(f"Explore **{st.session_state.selected_category}** concepts with progressive learning resources")
+            with col2:
+                if st.button("📚 Learn Topic", key="learn_more", use_container_width=True):
+                    st.switch_page("pages/1_📚_Topic_Resources.py")
 
         st.markdown("---")
 
